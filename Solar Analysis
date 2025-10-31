@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Solar Energy Analysis Platform</title>
+    
+    <!-- External Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+            --light-bg: #f8f9fa;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 10px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 1.8em;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--light-bg);
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+        
+        .sidebar {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+        
+        .tab-nav {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .data-panel {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .data-panel h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        .input-group input, 
+        .input-group select, 
+        .input-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus, 
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            margin: 3px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-panel {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .metric-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .metric-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 12px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 350px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success { background: var(--success-color); }
+        .notification.error { background: var(--error-color); }
+        .notification.warning { background: var(--warning-color); }
+        .notification.info { background: var(--primary-color); }
+        
+        .api-monitor {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 280px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .api-monitor.collapsed {
+            max-height: 35px;
+            overflow: hidden;
+        }
+        
+        .api-monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .api-monitor-header:hover {
+            opacity: 0.8;
+        }
+        
+        .api-monitor-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: background 0.2s ease;
+        }
+        
+        .api-monitor-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .api-logs-container {
+            transition: opacity 0.3s ease;
+        }
+        
+        .api-monitor.collapsed .api-logs-container {
+            opacity: 0;
+        }
+        
+        .api-log {
+            margin: 3px 0;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; height: 50vh; }
+            .metric-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>☀️ Solar Analysis Platform</h1>
+            </div>
+            <div class="status-bar">
+                <div class="status-indicator">
+                    <div class="status-dot" id="systemStatus"></div>
+                    <span>System Ready</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="SolarApp.switchTab('data')">📍 Location</button>
+                <button class="tab-btn" onclick="SolarApp.switchTab('analysis')">⚡ Analysis</button>
+                <button class="tab-btn" onclick="SolarApp.switchTab('results')">📊 Results</button>
+            </div>
+            
+            <!-- Location Tab -->
+            <div id="data-tab" class="tab-content active">
+                <div class="data-panel">
+                    <h3>🌍 Location Selection</h3>
+                    <div class="input-group">
+                        <label>Continent</label>
+                        <select id="continentSelect" onchange="SolarApp.selectContinent()">
+                            <option value="global">🌍 Global View</option>
+                            <option value="asia">🌏 Asia</option>
+                            <option value="africa">🌍 Africa</option>
+                            <option value="europe">🌍 Europe</option>
+                            <option value="americas">🌎 Americas</option>
+                            <option value="oceania">🌏 Oceania</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Coordinates</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <input type="number" id="latitude" placeholder="Latitude" value="19.0760" step="0.0001">
+                            <input type="number" id="longitude" placeholder="Longitude" value="72.8777" step="0.0001">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="SolarApp.analyzeLocation()">📍 Analyze This Location</button>
+                    <button class="btn btn-secondary" onclick="SolarApp.getCurrentLocation()">🎯 Use My Location</button>
+                </div>
+                
+                <div class="data-panel">
+                    <h3>🇮🇳 India Quick Select</h3>
+                    <div class="input-group">
+                        <label>Major Cities</label>
+                        <select id="indiaLocations" onchange="SolarApp.selectIndianLocation()">
+                            <option value="">Select City</option>
+                            <option value="28.6139,77.2090">Delhi</option>
+                            <option value="19.0760,72.8777">Mumbai</option>
+                            <option value="12.9716,77.5946">Bangalore</option>
+                            <option value="13.0827,80.2707">Chennai</option>
+                            <option value="22.5726,88.3639">Kolkata</option>
+                            <option value="23.0225,72.5714">Ahmedabad</option>
+                            <option value="26.9124,75.7873">Jaipur</option>
+                            <option value="17.3850,78.4867">Hyderabad</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="data-panel" id="locationInfo" style="display: none;">
+                    <h3>📊 Location Details</h3>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">Solar Resource</div>
+                            <div class="metric-value" id="solarResource">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Climate Zone</div>
+                            <div class="metric-value" id="climateZone">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analysis Tab -->
+            <div id="analysis-tab" class="tab-content">
+                <div class="data-panel">
+                    <h3>⚙️ System Configuration</h3>
+                    <div class="input-group">
+                        <label>System Size (kW)</label>
+                        <input type="number" id="systemSize" value="10" min="1" max="1000" step="0.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Panel Technology</label>
+                        <select id="panelType">
+                            <option value="mono">Monocrystalline (20% eff.)</option>
+                            <option value="poly">Polycrystalline (17% eff.)</option>
+                            <option value="bifacial">Bifacial (22% eff.)</option>
+                            <option value="perc">PERC (21% eff.)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Installation Type</label>
+                        <select id="installationType">
+                            <option value="rooftop">Rooftop</option>
+                            <option value="ground">Ground Mount</option>
+                            <option value="floating">Floating Solar</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <h3>📐 Orientation</h3>
+                    <div class="input-group">
+                        <label>Tilt Angle (degrees)</label>
+                        <input type="number" id="tiltAngle" value="20" min="0" max="90">
+                        <small style="color: #666;">Optimal: <span id="optimalTilt">20°</span></small>
+                    </div>
+                    <div class="input-group">
+                        <label>Azimuth (degrees)</label>
+                        <input type="number" id="azimuth" value="180" min="0" max="360">
+                        <small style="color: #666;">180° = South facing</small>
+                    </div>
+                    <button class="btn btn-secondary" onclick="SolarApp.optimizeOrientation()">🎯 Auto Optimize</button>
+                </div>
+                
+                <div class="data-panel">
+                    <h3>💰 Financial Parameters</h3>
+                    <div class="input-group">
+                        <label>Currency</label>
+                        <select id="currency">
+                            <option value="INR">₹ Indian Rupee</option>
+                            <option value="USD">$ US Dollar</option>
+                            <option value="EUR">€ Euro</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>System Cost per kW</label>
+                        <input type="number" id="systemCost" value="65000" step="1000">
+                        <small style="color: #666;">Including installation</small>
+                    </div>
+                    <div class="input-group">
+                        <label>Electricity Rate per kWh</label>
+                        <input type="number" id="electricityRate" value="7.5" step="0.1">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="SolarApp.runAnalysis()" style="width: calc(100% - 6px); margin: 3px;">
+                    ⚡ Run Complete Analysis
+                </button>
+            </div>
+            
+            <!-- Results Tab -->
+            <div id="results-tab" class="tab-content">
+                <div class="results-panel">
+                    <h3>📊 Analysis Results</h3>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">Annual Generation</div>
+                            <div class="metric-value" id="annualGeneration">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Capacity Factor</div>
+                            <div class="metric-value" id="capacityFactor">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Annual Savings</div>
+                            <div class="metric-value" id="annualSavings">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Payback Period</div>
+                            <div class="metric-value" id="paybackPeriod">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">CO₂ Avoided</div>
+                            <div class="metric-value" id="co2Avoided">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">LCOE</div>
+                            <div class="metric-value" id="lcoe">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-secondary" onclick="SolarApp.exportResults()">📥 Export Results</button>
+                        <button class="btn btn-secondary" onclick="SolarApp.generateReport()">📄 Generate Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <div style="margin-top: 10px; text-align: center; color: #666;">Processing...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="api-monitor" id="apiMonitor">
+        <div class="api-monitor-header" onclick="SolarApp.toggleSystemLog()">
+            <div style="color: var(--success-color); font-weight: bold;">System Log</div>
+            <button class="api-monitor-toggle" id="logToggleBtn" title="Toggle system log">−</button>
+        </div>
+        <div class="api-logs-container">
+            <div id="apiLogs"></div>
+        </div>
+    </div>
+    
+    <script>
+        // CONSTANTS - Replace magic numbers with named constants
+        const CONSTANTS = {
+            // Time
+            HOURS_IN_YEAR: 8760,
+            DAYS_IN_YEAR: 365,
+            MONTHS_IN_YEAR: 12,
+            
+            // Solar calculations
+            STANDARD_TEST_CONDITIONS_IRRADIANCE: 1000, // W/m²
+            PANEL_DEGRADATION_RATE: 0.005, // 0.5% per year
+            SYSTEM_AVAILABILITY: 0.97, // 97% uptime
+            
+            // Financial
+            PROJECT_LIFETIME_YEARS: 25,
+            INFLATION_RATE: 0.06, // 6% for India
+            DISCOUNT_RATE: 0.08, // 8% for India
+            
+            // Environmental
+            GRID_EMISSION_FACTOR_INDIA: 0.82, // kg CO2/kWh for Indian grid
+            GRID_EMISSION_FACTOR_GLOBAL: 0.5, // kg CO2/kWh global average
+            
+            // Panel efficiencies
+            PANEL_EFFICIENCIES: {
+                mono: 0.20,
+                poly: 0.17,
+                bifacial: 0.22,
+                perc: 0.21,
+                thin: 0.11
+            },
+            
+            // Currency symbols
+            CURRENCY_SYMBOLS: {
+                INR: '₹',
+                USD: '$',
+                EUR: '€',
+                GBP: '£'
+            },
+            
+            // Typical system losses
+            SYSTEM_LOSSES: {
+                inverter: 0.96,
+                wiring: 0.98,
+                soiling: 0.95,
+                shading: 0.98,
+                temperature: 0.92
+            }
+        };
+
+        // GLOBAL SOLAR DATABASE - Structured data for all regions
+        const SOLAR_DATABASE = {
+            asia: {
+                name: 'Asia',
+                regions: {
+                    india_north: {
+                        name: 'North India',
+                        center: [28.6139, 77.2090],
+                        ghi: 1750, dni: 2000, climate: 'subtropical'
+                    },
+                    india_west: {
+                        name: 'West India', 
+                        center: [19.0760, 72.8777],
+                        ghi: 1850, dni: 2200, climate: 'tropical'
+                    },
+                    india_south: {
+                        name: 'South India',
+                        center: [12.9716, 77.5946], 
+                        ghi: 1900, dni: 2300, climate: 'tropical'
+                    }
+                }
+            },
+            africa: {
+                name: 'Africa',
+                regions: {
+                    north_africa: {
+                        name: 'North Africa',
+                        center: [30.0444, 31.2357],
+                        ghi: 2400, dni: 3200, climate: 'arid'
+                    }
+                }
+            },
+            europe: {
+                name: 'Europe', 
+                regions: {
+                    southern_europe: {
+                        name: 'Southern Europe',
+                        center: [40.4168, -3.7038],
+                        ghi: 1650, dni: 2100, climate: 'mediterranean'
+                    }
+                }
+            },
+            americas: {
+                name: 'Americas',
+                regions: {
+                    usa_southwest: {
+                        name: 'US Southwest',
+                        center: [36.1627, -115.1627], 
+                        ghi: 2000, dni: 2600, climate: 'arid'
+                    }
+                }
+            },
+            oceania: {
+                name: 'Oceania',
+                regions: {
+                    australia: {
+                        name: 'Australia',
+                        center: [-25.2744, 133.7751],
+                        ghi: 2000, dni: 2600, climate: 'arid'
+                    }
+                }
+            }
+        };
+
+        // MAIN APPLICATION CLASS - Encapsulated functionality
+        class SolarAnalysisPlatform {
+            constructor() {
+                this.map = null;
+                this.currentLocation = { lat: 19.0760, lng: 72.8777 };
+                this.currentAnalysis = null;
+                this.monthlyChart = null;
+                this.isLogCollapsed = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.log('🌞 Initializing Solar Analysis Platform...', 'info');
+                
+                // Initialize components in proper sequence
+                this.initMap();
+                this.initCharts();
+                this.setupEventListeners();
+                this.updateLocationInfo();
+                
+                // Set up keyboard shortcuts
+                this.setupKeyboardShortcuts();
+                
+                this.log('✅ Platform initialized successfully', 'success');
+                this.showNotification('Solar Analysis Platform ready! Press Ctrl+L to toggle system log.', 'success');
+            }
+            
+            initMap() {
+                try {
+                    this.map = L.map('map').setView([this.currentLocation.lat, this.currentLocation.lng], 6);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(this.map);
+                    
+                    // Add click handler
+                    this.map.on('click', (e) => {
+                        this.handleMapClick(e);
+                    });
+                    
+                    this.log('🗺️ Map initialized', 'success');
+                } catch (error) {
+                    this.log(`❌ Map initialization failed: ${error.message}`, 'error');
+                }
+            }
+            
+            initCharts() {
+                try {
+                    const ctx = document.getElementById('monthlyChart');
+                    if (ctx) {
+                        this.monthlyChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                                datasets: [{
+                                    label: 'Monthly Generation (kWh)',
+                                    data: new Array(12).fill(0),
+                                    backgroundColor: 'rgba(30, 60, 114, 0.6)',
+                                    borderColor: 'rgba(30, 60, 114, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Generation (kWh)'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        this.log('📊 Charts initialized', 'success');
+                    }
+                } catch (error) {
+                    this.log(`❌ Chart initialization failed: ${error.message}`, 'error');
+                }
+            }
+            
+            setupEventListeners() {
+                // Coordinate inputs
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
+                
+                if (latInput && lngInput) {
+                    latInput.addEventListener('change', () => this.updateLocationFromInputs());
+                    lngInput.addEventListener('change', () => this.updateLocationFromInputs());
+                }
+                
+                // Currency change
+                const currencySelect = document.getElementById('currency');
+                if (currencySelect) {
+                    currencySelect.addEventListener('change', () => this.updateCurrencyDefaults());
+                }
+            }
+            
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Check for Ctrl/Cmd key combinations
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key.toLowerCase()) {
+                            case 'l':
+                                e.preventDefault();
+                                this.toggleSystemLog();
+                                break;
+                            case '1':
+                                e.preventDefault();
+                                this.switchTabProgrammatic('data');
+                                break;
+                            case '2':
+                                e.preventDefault();
+                                this.switchTabProgrammatic('analysis');
+                                break;
+                            case '3':
+                                e.preventDefault();
+                                this.switchTabProgrammatic('results');
+                                break;
+                            case 'r':
+                                e.preventDefault();
+                                if (document.querySelector('#analysis-tab.active')) {
+                                    this.runAnalysis();
+                                }
+                                break;
+                            case 'o':
+                                e.preventDefault();
+                                if (document.querySelector('#analysis-tab.active')) {
+                                    this.optimizeOrientation();
+                                }
+                                break;
+                            case 'e':
+                                e.preventDefault();
+                                this.exportResults();
+                                break;
+                            case 'g':
+                                e.preventDefault();
+                                this.generateReport();
+                                break;
+                        }
+                    }
+                    
+                    // ESC key to close loading spinner
+                    if (e.key === 'Escape') {
+                        this.showLoading(false);
+                    }
+                });
+            }
+            
+            handleMapClick(e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                
+                this.currentLocation = { lat, lng };
+                this.updateCoordinateInputs(lat, lng);
+                this.updateLocationInfo();
+                
+                // Show popup with analysis option
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent(`
+                        <div style="text-align: center; min-width: 150px;">
+                            <strong>📍 Selected Location</strong><br>
+                            <small>${lat.toFixed(4)}, ${lng.toFixed(4)}</small><br>
+                            <button onclick="SolarApp.analyzeLocation()" class="btn" style="margin-top: 8px; font-size: 0.8em;">
+                                ⚡ Quick Analysis
+                            </button>
+                        </div>
+                    `)
+                    .openOn(this.map);
+            }
+            
+            updateCoordinateInputs(lat, lng) {
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
+                
+                if (latInput) latInput.value = lat.toFixed(4);
+                if (lngInput) lngInput.value = lng.toFixed(4);
+                
+                this.updateOptimalTilt(lat);
+            }
+            
+            updateOptimalTilt(latitude) {
+                const optimalTilt = Math.abs(latitude);
+                const optimalTiltElement = document.getElementById('optimalTilt');
+                const tiltInput = document.getElementById('tiltAngle');
+                
+                if (optimalTiltElement) {
+                    optimalTiltElement.textContent = `${Math.round(optimalTilt)}°`;
+                }
+                
+                // Auto-update tilt if it's still default
+                if (tiltInput && Math.abs(parseFloat(tiltInput.value) - 20) < 1) {
+                    tiltInput.value = Math.round(optimalTilt);
+                }
+            }
+            
+            updateLocationFromInputs() {
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
+                
+                if (latInput && lngInput) {
+                    const lat = parseFloat(latInput.value);
+                    const lng = parseFloat(lngInput.value);
+                    
+                    if (!isNaN(lat) && !isNaN(lng) && 
+                        lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                        this.currentLocation = { lat, lng };
+                        this.map.setView([lat, lng], 8);
+                        this.updateLocationInfo();
+                        this.updateOptimalTilt(lat);
+                    }
+                }
+            }
+            
+            updateCurrencyDefaults() {
+                const currency = document.getElementById('currency').value;
+                const systemCostInput = document.getElementById('systemCost');
+                const electricityRateInput = document.getElementById('electricityRate');
+                
+                // Update default values based on currency/region
+                const defaults = {
+                    INR: { systemCost: 65000, electricityRate: 7.5 },
+                    USD: { systemCost: 2500, electricityRate: 0.12 },
+                    EUR: { systemCost: 2200, electricityRate: 0.25 }
+                };
+                
+                if (defaults[currency]) {
+                    if (systemCostInput) systemCostInput.value = defaults[currency].systemCost;
+                    if (electricityRateInput) electricityRateInput.value = defaults[currency].electricityRate;
+                }
+            }
+            
+            updateLocationInfo() {
+                const locationInfoPanel = document.getElementById('locationInfo');
+                const solarResourceElement = document.getElementById('solarResource');
+                const climateZoneElement = document.getElementById('climateZone');
+                
+                if (!locationInfoPanel || !solarResourceElement || !climateZoneElement) return;
+                
+                try {
+                    const solarData = this.getSolarResourceData(this.currentLocation);
+                    
+                    solarResourceElement.textContent = `${solarData.ghi} kWh/m²/year`;
+                    climateZoneElement.textContent = this.getClimateZone(this.currentLocation);
+                    
+                    locationInfoPanel.style.display = 'block';
+                } catch (error) {
+                    this.log(`Error updating location info: ${error.message}`, 'error');
+                }
+            }
+            
+            getSolarResourceData(location) {
+                // Determine region and get solar data
+                const { lat, lng } = location;
+                
+                // India regions
+                if (lat >= 8 && lat <= 37 && lng >= 68 && lng <= 97) {
+                    if (lat >= 24) return { ghi: 1750, dni: 2000, region: 'North India' };
+                    if (lng <= 77) return { ghi: 1850, dni: 2200, region: 'West India' };
+                    return { ghi: 1900, dni: 2300, region: 'South India' };
+                }
+                
+                // Global fallback based on latitude
+                const absLat = Math.abs(lat);
+                if (absLat < 23.5) return { ghi: 2000, dni: 2500, region: 'Tropical' };
+                if (absLat < 35) return { ghi: 1700, dni: 2200, region: 'Subtropical' };
+                return { ghi: 1300, dni: 1800, region: 'Temperate' };
+            }
+            
+            getClimateZone(location) {
+                const { lat } = location;
+                const absLat = Math.abs(lat);
+                
+                if (absLat < 23.5) return 'Tropical';
+                if (absLat < 35) return 'Subtropical';
+                if (absLat < 50) return 'Temperate';
+                return 'Cold';
+            }
+            
+            switchTab(tabName) {
+                try {
+                    // Remove active from all tabs
+                    document.querySelectorAll('.tab-btn').forEach(btn => 
+                        btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => 
+                        content.classList.remove('active'));
+                    
+                    // Activate selected tab
+                    const tabButton = event.target;
+                    const tabContent = document.getElementById(`${tabName}-tab`);
+                    
+                    if (tabButton && tabContent) {
+                        tabButton.classList.add('active');
+                        tabContent.classList.add('active');
+                        this.log(`Switched to ${tabName} tab`, 'info');
+                    }
+                } catch (error) {
+                    this.log(`Error switching tabs: ${error.message}`, 'error');
+                }
+            }
+            
+            selectContinent() {
+                const continentSelect = document.getElementById('continentSelect');
+                if (!continentSelect) return;
+                
+                const continent = continentSelect.value;
+                
+                if (continent === 'global') {
+                    this.map.setView([20, 0], 2);
+                    return;
+                }
+                
+                // Focus on continent
+                const continentCenters = {
+                    asia: [25, 100],
+                    africa: [0, 20], 
+                    europe: [50, 10],
+                    americas: [40, -100],
+                    oceania: [-25, 140]
+                };
+                
+                if (continentCenters[continent]) {
+                    this.map.setView(continentCenters[continent], 3);
+                    this.log(`Focused on ${continent}`, 'info');
+                }
+            }
+            
+            selectIndianLocation() {
+                const select = document.getElementById('indiaLocations');
+                if (!select || !select.value) return;
+                
+                const [lat, lng] = select.value.split(',').map(Number);
+                this.currentLocation = { lat, lng };
+                
+                this.updateCoordinateInputs(lat, lng);
+                this.map.setView([lat, lng], 10);
+                this.updateLocationInfo();
+                
+                this.showNotification(`Location set to ${select.options[select.selectedIndex].text}`, 'success');
+            }
+            
+            getCurrentLocation() {
+                if (navigator.geolocation) {
+                    this.showLoading(true);
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            this.currentLocation = { lat, lng };
+                            this.updateCoordinateInputs(lat, lng);
+                            this.map.setView([lat, lng], 12);
+                            this.updateLocationInfo();
+                            
+                            this.showNotification('Location updated to your current position', 'success');
+                            this.showLoading(false);
+                        },
+                        (error) => {
+                            this.showNotification('Could not get your location', 'error');
+                            this.showLoading(false);
+                        }
+                    );
+                } else {
+                    this.showNotification('Geolocation not supported by this browser', 'warning');
+                }
+            }
+            
+            optimizeOrientation() {
+                const { lat } = this.currentLocation;
+                
+                // Calculate optimal tilt (approximately latitude for fixed systems)
+                const optimalTilt = Math.max(0, Math.min(60, Math.abs(lat)));
+                
+                // Optimal azimuth (180° south for northern hemisphere, 0° north for southern)
+                const optimalAzimuth = lat > 0 ? 180 : 0;
+                
+                // Update inputs
+                const tiltInput = document.getElementById('tiltAngle');
+                const azimuthInput = document.getElementById('azimuth');
+                
+                if (tiltInput) tiltInput.value = Math.round(optimalTilt);
+                if (azimuthInput) azimuthInput.value = optimalAzimuth;
+                
+                this.showNotification(`Orientation optimized: ${Math.round(optimalTilt)}° tilt, ${optimalAzimuth}° azimuth`, 'success');
+                this.log(`Optimized orientation for lat ${lat.toFixed(2)}`, 'info');
+            }
+            
+            runAnalysis() {
+                this.showLoading(true);
+                this.log('🔄 Running solar analysis...', 'info');
+                
+                try {
+                    // Get all input parameters
+                    const params = this.getAnalysisParameters();
+                    
+                    // Validate inputs
+                    if (!this.validateParameters(params)) {
+                        this.showLoading(false);
+                        return;
+                    }
+                    
+                    // Simulate analysis delay
+                    setTimeout(() => {
+                        try {
+                            const results = this.calculateSolarAnalysis(params);
+                            this.displayResults(results);
+                            this.updateChart(results.monthlyGeneration);
+                            this.currentAnalysis = results;
+                            
+                            this.showNotification('Analysis completed successfully!', 'success');
+                            this.log(`✅ Analysis complete: ${results.annualGeneration} kWh/year`, 'success');
+                            
+                            // Switch to results tab
+                            this.switchTabProgrammatic('results');
+                        } catch (error) {
+                            this.showNotification(`Analysis failed: ${error.message}`, 'error');
+                            this.log(`❌ Analysis error: ${error.message}`, 'error');
+                        } finally {
+                            this.showLoading(false);
+                        }
+                    }, 2000);
+                    
+                } catch (error) {
+                    this.showNotification(`Analysis setup failed: ${error.message}`, 'error');
+                    this.showLoading(false);
+                }
+            }
+            
+            getAnalysisParameters() {
+                const getValue = (id, defaultValue = 0) => {
+                    const element = document.getElementById(id);
+                    return element ? parseFloat(element.value) || defaultValue : defaultValue;
+                };
+                
+                const getSelectValue = (id, defaultValue = '') => {
+                    const element = document.getElementById(id);
+                    return element ? element.value : defaultValue;
+                };
+                
+                return {
+                    location: this.currentLocation,
+                    systemSize: getValue('systemSize', 10),
+                    panelType: getSelectValue('panelType', 'mono'),
+                    installationType: getSelectValue('installationType', 'rooftop'),
+                    tiltAngle: getValue('tiltAngle', 20),
+                    azimuth: getValue('azimuth', 180),
+                    currency: getSelectValue('currency', 'INR'),
+                    systemCost: getValue('systemCost', 65000),
+                    electricityRate: getValue('electricityRate', 7.5)
+                };
+            }
+            
+            validateParameters(params) {
+                const validations = [
+                    { condition: params.systemSize > 0, message: 'System size must be greater than 0' },
+                    { condition: params.systemSize <= 1000, message: 'System size too large (max 1000 kW)' },
+                    { condition: params.tiltAngle >= 0 && params.tiltAngle <= 90, message: 'Tilt angle must be 0-90°' },
+                    { condition: params.azimuth >= 0 && params.azimuth <= 360, message: 'Azimuth must be 0-360°' },
+                    { condition: params.systemCost > 0, message: 'System cost must be positive' },
+                    { condition: params.electricityRate > 0, message: 'Electricity rate must be positive' }
+                ];
+                
+                for (const validation of validations) {
+                    if (!validation.condition) {
+                        this.showNotification(validation.message, 'error');
+                        return false;
+                    }
+                }
+                return true;
+            }
+            
+            calculateSolarAnalysis(params) {
+                // Get solar resource data for location
+                const solarData = this.getSolarResourceData(params.location);
+                
+                // Panel efficiency
+                const panelEfficiency = CONSTANTS.PANEL_EFFICIENCIES[params.panelType];
+                
+                // Calculate orientation factors
+                const tiltFactor = this.calculateTiltFactor(params.tiltAngle, params.location.lat);
+                const azimuthFactor = this.calculateAzimuthFactor(params.azimuth, params.location.lat);
+                
+                // Installation type factor
+                const installationFactors = {
+                    rooftop: 0.95,
+                    ground: 1.0,
+                    floating: 1.02
+                };
+                const installationFactor = installationFactors[params.installationType];
+                
+                // Calculate overall system efficiency
+                const systemEfficiency = Object.values(CONSTANTS.SYSTEM_LOSSES).reduce((a, b) => a * b, 1);
+                const overallEfficiency = panelEfficiency * systemEfficiency * tiltFactor * 
+                                        azimuthFactor * installationFactor;
+                
+                // Annual generation calculation
+                const specificYield = solarData.ghi * overallEfficiency; // kWh/kW/year
+                const annualGeneration = Math.round(specificYield * params.systemSize);
+                
+                // Capacity factor
+                const capacityFactor = (specificYield / CONSTANTS.HOURS_IN_YEAR) * 100;
+                
+                // Financial calculations
+                const totalSystemCost = params.systemSize * params.systemCost;
+                const annualSavings = annualGeneration * params.electricityRate;
+                
+                // Simple payback period
+                const paybackPeriod = totalSystemCost / annualSavings;
+                
+                // LCOE calculation (simplified)
+                const lcoe = this.calculateLCOE(totalSystemCost, annualGeneration, params.electricityRate);
+                
+                // Environmental impact
+                const co2Avoided = Math.round(annualGeneration * CONSTANTS.GRID_EMISSION_FACTOR_INDIA);
+                
+                // Monthly generation profile
+                const monthlyGeneration = this.generateMonthlyProfile(annualGeneration, params.location.lat);
+                
+                return {
+                    annualGeneration,
+                    capacityFactor: Math.round(capacityFactor * 10) / 10,
+                    annualSavings: Math.round(annualSavings),
+                    paybackPeriod: Math.round(paybackPeriod * 10) / 10,
+                    lcoe: Math.round(lcoe * 100) / 100,
+                    co2Avoided,
+                    monthlyGeneration,
+                    currency: params.currency,
+                    systemDetails: {
+                        specificYield: Math.round(specificYield),
+                        overallEfficiency: Math.round(overallEfficiency * 100),
+                        solarResource: solarData
+                    }
+                };
+            }
+            
+            calculateTiltFactor(tiltAngle, latitude) {
+                // Simplified tilt factor calculation
+                const optimalTilt = Math.abs(latitude);
+                const tiltDeviation = Math.abs(tiltAngle - optimalTilt);
+                
+                // Cosine loss for tilt deviation
+                return Math.cos(tiltDeviation * Math.PI / 180) * 0.9 + 0.1;
+            }
+            
+            calculateAzimuthFactor(azimuth, latitude) {
+                // Optimal azimuth: 180° for northern hemisphere, 0° for southern
+                const optimalAzimuth = latitude > 0 ? 180 : 0;
+                const azimuthDeviation = Math.abs(azimuth - optimalAzimuth);
+                
+                // Cosine loss for azimuth deviation
+                return Math.cos(azimuthDeviation * Math.PI / 180) * 0.85 + 0.15;
+            }
+            
+            calculateLCOE(capitalCost, annualGeneration, electricityRate) {
+                // Simplified LCOE calculation
+                const annualOM = capitalCost * 0.02; // 2% O&M
+                const totalLifetimeCost = capitalCost + (annualOM * CONSTANTS.PROJECT_LIFETIME_YEARS);
+                const totalLifetimeGeneration = annualGeneration * CONSTANTS.PROJECT_LIFETIME_YEARS * 
+                                              (1 - CONSTANTS.PANEL_DEGRADATION_RATE * CONSTANTS.PROJECT_LIFETIME_YEARS / 2);
+                
+                return totalLifetimeCost / totalLifetimeGeneration;
+            }
+            
+            generateMonthlyProfile(annualGeneration, latitude) {
+                // Seasonal factors based on latitude
+                let monthlyFactors;
+                
+                if (latitude > 0) {
+                    // Northern hemisphere - summer peak
+                    monthlyFactors = [0.7, 0.8, 0.95, 1.1, 1.25, 1.35, 1.4, 1.3, 1.15, 0.95, 0.8, 0.65];
+                } else {
+                    // Southern hemisphere - inverted seasons
+                    monthlyFactors = [1.35, 1.3, 1.15, 0.95, 0.8, 0.65, 0.7, 0.8, 0.95, 1.1, 1.25, 1.4];
+                }
+                
+                // Normalize factors to ensure they sum to 12
+                const sum = monthlyFactors.reduce((a, b) => a + b, 0);
+                const normalizedFactors = monthlyFactors.map(f => f * 12 / sum);
+                
+                return normalizedFactors.map(factor => 
+                    Math.round(annualGeneration * factor / 12)
+                );
+            }
+            
+            displayResults(results) {
+                const currencySymbol = CONSTANTS.CURRENCY_SYMBOLS[results.currency] || '';
+                
+                this.updateElement('annualGeneration', `${results.annualGeneration.toLocaleString()} kWh`);
+                this.updateElement('capacityFactor', `${results.capacityFactor}%`);
+                this.updateElement('annualSavings', `${currencySymbol}${results.annualSavings.toLocaleString()}`);
+                this.updateElement('paybackPeriod', `${results.paybackPeriod} years`);
+                this.updateElement('lcoe', `${currencySymbol}${results.lcoe}/kWh`);
+                this.updateElement('co2Avoided', `${results.co2Avoided.toLocaleString()} kg/year`);
+            }
+            
+            updateElement(id, value) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+            
+            updateChart(monthlyData) {
+                if (this.monthlyChart && monthlyData) {
+                    this.monthlyChart.data.datasets[0].data = monthlyData;
+                    this.monthlyChart.update();
+                }
+            }
+            
+            switchTabProgrammatic(tabName) {
+                // Remove active from all
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Find and activate the target tab
+                const tabs = document.querySelectorAll('.tab-btn');
+                const tabNames = ['data', 'analysis', 'results'];
+                const targetIndex = tabNames.indexOf(tabName);
+                
+                if (targetIndex >= 0 && tabs[targetIndex]) {
+                    tabs[targetIndex].classList.add('active');
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                }
+            }
+            
+            analyzeLocation() {
+                // Quick analysis with current location
+                this.map.closePopup();
+                
+                // Auto-switch to analysis tab and run
+                this.switchTabProgrammatic('analysis');
+                setTimeout(() => this.runAnalysis(), 500);
+            }
+            
+            exportResults() {
+                if (!this.currentAnalysis) {
+                    this.showNotification('No analysis results to export', 'warning');
+                    return;
+                }
+                
+                try {
+                    const exportData = {
+                        timestamp: new Date().toISOString(),
+                        location: this.currentLocation,
+                        parameters: this.getAnalysisParameters(),
+                        results: this.currentAnalysis,
+                        metadata: {
+                            version: '2.0',
+                            platform: 'Solar Analysis Platform'
+                        }
+                    };
+                    
+                    const dataStr = JSON.stringify(exportData, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                    
+                    const fileName = `solar_analysis_${new Date().toISOString().split('T')[0]}.json`;
+                    
+                    const link = document.createElement('a');
+                    link.setAttribute('href', dataUri);
+                    link.setAttribute('download', fileName);
+                    link.click();
+                    
+                    this.showNotification('Results exported successfully', 'success');
+                    this.log('📥 Results exported to JSON', 'success');
+                    
+                } catch (error) {
+                    this.showNotification('Export failed: ' + error.message, 'error');
+                    this.log(`❌ Export error: ${error.message}`, 'error');
+                }
+            }
+            
+            generateReport() {
+                if (!this.currentAnalysis) {
+                    this.showNotification('No analysis results to generate report', 'warning');
+                    return;
+                }
+                
+                const results = this.currentAnalysis;
+                const params = this.getAnalysisParameters();
+                const currencySymbol = CONSTANTS.CURRENCY_SYMBOLS[results.currency] || '';
+                
+                const reportHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Solar Analysis Report</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+                            .header { text-align: center; margin-bottom: 40px; color: #1e3c72; }
+                            .section { margin: 30px 0; }
+                            .metric { display: inline-block; margin: 10px 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+                            .location { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                            @media print { body { margin: 20px; } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>☀️ Solar Energy Analysis Report</h1>
+                            <p>Generated on ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        
+                        <div class="location">
+                            <h3>📍 Project Location</h3>
+                            <p><strong>Coordinates:</strong> ${this.currentLocation.lat.toFixed(4)}°, ${this.currentLocation.lng.toFixed(4)}°</p>
+                            <p><strong>Solar Resource:</strong> ${results.systemDetails.solarResource.ghi} kWh/m²/year</p>
+                            <p><strong>Climate Zone:</strong> ${this.getClimateZone(this.currentLocation)}</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>⚙️ System Configuration</h3>
+                            <div class="metric"><strong>System Size:</strong> ${params.systemSize} kW</div>
+                            <div class="metric"><strong>Panel Type:</strong> ${params.panelType}</div>
+                            <div class="metric"><strong>Installation:</strong> ${params.installationType}</div>
+                            <div class="metric"><strong>Orientation:</strong> ${params.tiltAngle}° tilt, ${params.azimuth}° azimuth</div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>⚡ Performance Results</h3>
+                            <div class="metric"><strong>Annual Generation:</strong> ${results.annualGeneration.toLocaleString()} kWh</div>
+                            <div class="metric"><strong>Capacity Factor:</strong> ${results.capacityFactor}%</div>
+                            <div class="metric"><strong>Specific Yield:</strong> ${results.systemDetails.specificYield} kWh/kW</div>
+                            <div class="metric"><strong>System Efficiency:</strong> ${results.systemDetails.overallEfficiency}%</div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>💰 Financial Analysis</h3>
+                            <div class="metric"><strong>Annual Savings:</strong> ${currencySymbol}${results.annualSavings.toLocaleString()}</div>
+                            <div class="metric"><strong>Payback Period:</strong> ${results.paybackPeriod} years</div>
+                            <div class="metric"><strong>LCOE:</strong> ${currencySymbol}${results.lcoe}/kWh</div>
+                            <div class="metric"><strong>System Cost:</strong> ${currencySymbol}${(params.systemSize * params.systemCost).toLocaleString()}</div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>🌱 Environmental Impact</h3>
+                            <div class="metric"><strong>CO₂ Avoided:</strong> ${results.co2Avoided.toLocaleString()} kg/year</div>
+                            <div class="metric"><strong>25-Year CO₂ Reduction:</strong> ${(results.co2Avoided * 25).toLocaleString()} kg</div>
+                        </div>
+                        
+                        <div class="section" style="margin-top: 40px; text-align: center; font-size: 0.9em; color: #666;">
+                            <p><em>Report generated by Solar Analysis Platform</em></p>
+                            <p>Analysis based on location-specific solar resource data and industry-standard calculations</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(reportHTML);
+                newWindow.document.close();
+                
+                this.showNotification('Report generated successfully', 'success');
+                this.log('📄 Report generated', 'success');
+            }
+            
+            toggleSystemLog() {
+                const monitor = document.getElementById('apiMonitor');
+                const toggleBtn = document.getElementById('logToggleBtn');
+                
+                if (!monitor || !toggleBtn) return;
+                
+                this.isLogCollapsed = !this.isLogCollapsed;
+                
+                if (this.isLogCollapsed) {
+                    monitor.classList.add('collapsed');
+                    toggleBtn.textContent = '+';
+                    toggleBtn.title = 'Show system log';
+                } else {
+                    monitor.classList.remove('collapsed');
+                    toggleBtn.textContent = '−';
+                    toggleBtn.title = 'Hide system log';
+                }
+                
+                this.log(`System log ${this.isLogCollapsed ? 'collapsed' : 'expanded'}`, 'info');
+            }
+            
+            showLoading(show) {
+                const spinner = document.getElementById('loadingSpinner');
+                if (spinner) {
+                    spinner.style.display = show ? 'flex' : 'none';
+                }
+            }
+            
+            showNotification(message, type = 'info') {
+                try {
+                    const notification = document.createElement('div');
+                    notification.className = `notification ${type} show`;
+                    notification.textContent = message;
+                    
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        setTimeout(() => {
+                            if (document.body.contains(notification)) {
+                                document.body.removeChild(notification);
+                            }
+                        }, 300);
+                    }, 4000);
+                } catch (error) {
+                    console.error('Notification error:', error);
+                }
+            }
+            
+            log(message, type = 'info') {
+                try {
+                    const timestamp = new Date().toLocaleTimeString();
+                    const colors = {
+                        info: '#2196f3',
+                        success: '#4caf50', 
+                        error: '#f44336',
+                        warning: '#ff9800'
+                    };
+                    
+                    const log = document.createElement('div');
+                    log.className = 'api-log';
+                    log.innerHTML = `<span style="color: ${colors[type]}">[${timestamp}]</span> ${message}`;
+                    
+                    const logsContainer = document.getElementById('apiLogs');
+                    if (logsContainer) {
+                        logsContainer.appendChild(log);
+                        logsContainer.scrollTop = logsContainer.scrollHeight;
+                        
+                        // Keep only last 15 logs
+                        while (logsContainer.children.length > 15) {
+                            logsContainer.removeChild(logsContainer.firstChild);
+                        }
+                    }
+                    
+                    // Also log to console
+                    console.log(`[${type.toUpperCase()}] ${message}`);
+                    
+                } catch (error) {
+                    console.error('Logging error:', error);
+                }
+            }
+        }
+
+        // Initialize the application
+        let SolarApp;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                SolarApp = new SolarAnalysisPlatform();
+                
+                // Add help tooltip
+                setTimeout(() => {
+                    if (SolarApp) {
+                        SolarApp.showNotification('💡 Tip: Use Ctrl+L to toggle system log, Ctrl+1-3 for tabs', 'info');
+                    }
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Failed to initialize Solar Analysis Platform:', error);
+                alert('Failed to load the application. Please refresh the page.');
+            }
+        });
+        
+        // Global error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            if (SolarApp) {
+                SolarApp.log(`System error: ${e.message}`, 'error');
+            }
+        });
+        
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Solar Energy Analysis Platform</title>
+    
+    <!-- External Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+            --light-bg: #f8f9fa;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 10px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 1.8em;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--light-bg);
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+        
+        .sidebar {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+        
+        .tab-nav {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .data-panel {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .data-panel h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        .input-group input, 
+        .input-group select, 
+        .input-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus, 
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            margin: 3px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-panel {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .metric-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .metric-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 12px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 350px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success { background: var(--success-color); }
+        .notification.error { background: var(--error-color); }
+        .notification.warning { background: var(--warning-color); }
+        .notification.info { background: var(--primary-color); }
+        
+        .api-monitor {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 280px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .api-monitor.collapsed {
+            max-height: 35px;
+            overflow: hidden;
+        }
+        
+        .api-monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .api-monitor-header:hover {
+            opacity: 0.8;
+        }
+        
+        .api-monitor-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: background 0.2s ease;
+        }
+        
+        .api-monitor-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .api-logs-container {
+            transition: opacity 0.3s ease;
+        }
+        
+        .api-monitor.collapsed .api-logs-container {
+            opacity: 0;
+        }
+        
+        .api-log {
+            margin: 3px 0;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; height: 50vh; }
+            .metric-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>☀️ Solar Analysis Platform</h1>
+            </div>
+            <div class="status-bar">
+                <div class="status-indicator">
+                    <div class="status-dot" id="systemStatus"></div>
+                    <span>System Ready</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="SolarApp.switchTab('data')">📍 Location</button>
+                <button class="tab-btn" onclick="SolarApp.switchTab('analysis')">⚡ Analysis</button>
+                <button class="tab-btn" onclick="SolarApp.switchTab('results')">📊 Results</button>
+            </div>
+            
+            <!-- Location Tab -->
+            <div id="data-tab" class="tab-content active">
+                <div class="data-panel">
+                    <h3>🌍 Location Selection</h3>
+                    <div class="input-group">
+                        <label>Continent</label>
+                        <select id="continentSelect" onchange="SolarApp.selectContinent()">
+                            <option value="global">🌍 Global View</option>
+                            <option value="asia">🌏 Asia</option>
+                            <option value="africa">🌍 Africa</option>
+                            <option value="europe">🌍 Europe</option>
+                            <option value="americas">🌎 Americas</option>
+                            <option value="oceania">🌏 Oceania</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Coordinates</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <input type="number" id="latitude" placeholder="Latitude" value="19.0760" step="0.0001">
+                            <input type="number" id="longitude" placeholder="Longitude" value="72.8777" step="0.0001">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="SolarApp.analyzeLocation()">📍 Analyze This Location</button>
+                    <button class="btn btn-secondary" onclick="SolarApp.getCurrentLocation()">🎯 Use My Location</button>
+                </div>
+                
+                <div class="data-panel">
+                    <h3>🇮🇳 India Quick Select</h3>
+                    <div class="input-group">
+                        <label>Major Cities</label>
+                        <select id="indiaLocations" onchange="SolarApp.selectIndianLocation()">
+                            <option value="">Select City</option>
+                            <option value="28.6139,77.2090">Delhi</option>
+                            <option value="19.0760,72.8777">Mumbai</option>
+                            <option value="12.9716,77.5946">Bangalore</option>
+                            <option value="13.0827,80.2707">Chennai</option>
+                            <option value="22.5726,88.3639">Kolkata</option>
+                            <option value="23.0225,72.5714">Ahmedabad</option>
+                            <option value="26.9124,75.7873">Jaipur</option>
+                            <option value="17.3850,78.4867">Hyderabad</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="data-panel" id="locationInfo" style="display: none;">
+                    <h3>📊 Location Details</h3>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">Solar Resource</div>
+                            <div class="metric-value" id="solarResource">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Climate Zone</div>
+                            <div class="metric-value" id="climateZone">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analysis Tab -->
+            <div id="analysis-tab" class="tab-content">
+                <div class="data-panel">
+                    <h3>⚙️ System Configuration</h3>
+                    <div class="input-group">
+                        <label>System Size (kW)</label>
+                        <input type="number" id="systemSize" value="10" min="1" max="1000" step="0.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Panel Technology</label>
+                        <select id="panelType">
+                            <option value="mono">Monocrystalline (20% eff.)</option>
+                            <option value="poly">Polycrystalline (17% eff.)</option>
+                            <option value="bifacial">Bifacial (22% eff.)</option>
+                            <option value="perc">PERC (21% eff.)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Installation Type</label>
+                        <select id="installationType">
+                            <option value="rooftop">Rooftop</option>
+                            <option value="ground">Ground Mount</option>
+                            <option value="floating">Floating Solar</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="data-panel">
+                    <h3>📐 Orientation</h3>
+                    <div class="input-group">
+                        <label>Tilt Angle (degrees)</label>
+                        <input type="number" id="tiltAngle" value="20" min="0" max="90">
+                        <small style="color: #666;">Optimal: <span id="optimalTilt">20°</span></small>
+                    </div>
+                    <div class="input-group">
+                        <label>Azimuth (degrees)</label>
+                        <input type="number" id="azimuth" value="180" min="0" max="360">
+                        <small style="color: #666;">180° = South facing</small>
+                    </div>
+                    <button class="btn btn-secondary" onclick="SolarApp.optimizeOrientation()">🎯 Auto Optimize</button>
+                </div>
+                
+                <div class="data-panel">
+                    <h3>💰 Financial Parameters</h3>
+                    <div class="input-group">
+                        <label>Currency</label>
+                        <select id="currency">
+                            <option value="INR">₹ Indian Rupee</option>
+                            <option value="USD">$ US Dollar</option>
+                            <option value="EUR">€ Euro</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>System Cost per kW</label>
+                        <input type="number" id="systemCost" value="65000" step="1000">
+                        <small style="color: #666;">Including installation</small>
+                    </div>
+                    <div class="input-group">
+                        <label>Electricity Rate per kWh</label>
+                        <input type="number" id="electricityRate" value="7.5" step="0.1">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="SolarApp.runAnalysis()" style="width: calc(100% - 6px); margin: 3px;">
+                    ⚡ Run Complete Analysis
+                </button>
+            </div>
+            
+            <!-- Results Tab -->
+            <div id="results-tab" class="tab-content">
+                <div class="results-panel">
+                    <h3>📊 Analysis Results</h3>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">Annual Generation</div>
+                            <div class="metric-value" id="annualGeneration">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Capacity Factor</div>
+                            <div class="metric-value" id="capacityFactor">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Annual Savings</div>
+                            <div class="metric-value" id="annualSavings">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Payback Period</div>
+                            <div class="metric-value" id="paybackPeriod">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">CO₂ Avoided</div>
+                            <div class="metric-value" id="co2Avoided">-</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">LCOE</div>
+                            <div class="metric-value" id="lcoe">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-secondary" onclick="SolarApp.exportResults()">📥 Export Results</button>
+                        <button class="btn btn-secondary" onclick="SolarApp.generateReport()">📄 Generate Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <div style="margin-top: 10px; text-align: center; color: #666;">Processing...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="api-monitor" id="apiMonitor">
+        <div class="api-monitor-header" onclick="SolarApp.toggleSystemLog()">
+            <div style="color: var(--success-color); font-weight: bold;">System Log</div>
+            <button class="api-monitor-toggle" id="logToggleBtn" title="Toggle system log">−</button>
+        </div>
+        <div class="api-logs-container">
+            <div id="apiLogs"></div>
+        </div>
+    </div>
+    
+    <script>
+        // CONSTANTS - Replace magic numbers with named constants
+        const CONSTANTS = {
+            // Time
+            HOURS_IN_YEAR: 8760,
+            DAYS_IN_YEAR: 365,
+            MONTHS_IN_YEAR: 12,
+            
+            // Solar calculations
+            STANDARD_TEST_CONDITIONS_IRRADIANCE: 1000, // W/m²
+            PANEL_DEGRADATION_RATE: 0.005, // 0.5% per year
+            SYSTEM_AVAILABILITY: 0.97, // 97% uptime
+            
+            // Financial
+            PROJECT_LIFETIME_YEARS: 25,
+            INFLATION_RATE: 0.06, // 6% for India
+            DISCOUNT_RATE: 0.08, // 8% for India
+            
+            // Environmental
+            GRID_EMISSION_FACTOR_INDIA: 0.82, // kg CO2/kWh for Indian grid
+            GRID_EMISSION_FACTOR_GLOBAL: 0.5, // kg CO2/kWh global average
+            
+            // Panel efficiencies
+            PANEL_EFFICIENCIES: {
+                mono: 0.20,
+                poly: 0.17,
+                bifacial: 0.22,
+                perc: 0.21,
+                thin: 0.11
+            },
+            
+            // Currency symbols
+            CURRENCY_SYMBOLS: {
+                INR: '₹',
+                USD: '$',
+                EUR: '€',
+                GBP: '£'
+            },
+            
+            // Typical system losses
+            SYSTEM_LOSSES: {
+                inverter: 0.96,
+                wiring: 0.98,
+                soiling: 0.95,
+                shading: 0.98,
+                temperature: 0.92
+            }
+        };
+
+        // GLOBAL SOLAR DATABASE - Structured data for all regions
+        const SOLAR_DATABASE = {
+            asia: {
+                name: 'Asia',
+                regions: {
+                    india_north: {
+                        name: 'North India',
+                        center: [28.6139, 77.2090],
+                        ghi: 1750, dni: 2000, climate: 'subtropical'
+                    },
+                    india_west: {
+                        name: 'West India', 
+                        center: [19.0760, 72.8777],
+                        ghi: 1850, dni: 2200, climate: 'tropical'
+                    },
+                    india_south: {
+                        name: 'South India',
+                        center: [12.9716, 77.5946], 
+                        ghi: 1900, dni: 2300, climate: 'tropical'
+                    }
+                }
+            },
+            africa: {
+                name: 'Africa',
+                regions: {
+                    north_africa: {
+                        name: 'North Africa',
+                        center: [30.0444, 31.2357],
+                        ghi: 2400, dni: 3200, climate: 'arid'
+                    }
+                }
+            },
+            europe: {
+                name: 'Europe', 
+                regions: {
+                    southern_europe: {
+                        name: 'Southern Europe',
+                        center: [40.4168, -3.7038],
+                        ghi: 1650, dni: 2100, climate: 'mediterranean'
+                    }
+                }
+            },
+            americas: {
+                name: 'Americas',
+                regions: {
+                    usa_southwest: {
+                        name: 'US Southwest',
+                        center: [36.1627, -115.1627], 
+                        ghi: 2000, dni: 2600, climate: 'arid'
+                    }
+                }
+            },
+            oceania: {
+                name: 'Oceania',
+                regions: {
+                    australia: {
+                        name: 'Australia',
+                        center: [-25.2744, 133.7751],
+                        ghi: 2000, dni: 2600, climate: 'arid'
+                    }
+                }
+            }
+        };
+
+        // MAIN APPLICATION CLASS - Encapsulated functionality
+        class SolarAnalysisPlatform {
+            constructor() {
+                this.map = null;
+                this.currentLocation = { lat: 19.0760, lng: 72.8777 };
+                this.currentAnalysis = null;
+                this.monthlyChart = null;
+                this.isLogCollapsed = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.log('🌞 Initializing Solar Analysis Platform...', 'info');
+                
+                // Initialize components in proper sequence
+                this.initMap();
+                this.initCharts();
+                this.setupEventListeners();
+                this.updateLocationInfo();
+                
+                // Set up keyboard shortcuts
+                this.setupKeyboardShortcuts();
+                
+                this.log('✅ Platform initialized successfully', 'success');
+                this.showNotification('Solar Analysis Platform ready! Press Ctrl+L to toggle system log.', 'success');
+            }
+            
+            initMap() {
+                try {
+                    this.map = L.map('map').setView([this.currentLocation.lat, this.currentLocation.lng], 6);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(this.map);
+                    
+                    // Add click handler
+                    this.map.on('click', (e) => {
+                        this.handleMapClick(e);
+                    });
+                    
+                    this.log('🗺️ Map initialized', 'success');
+                } catch (error) {
+                    this.log(`❌ Map initialization failed: ${error.message}`, 'error');
+                }
+            }
+            
+            initCharts() {
+                try {
+                    const ctx = document.getElementById('monthlyChart');
+                    if (ctx) {
+                        this.monthlyChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                                datasets: [{
+                                    label: 'Monthly Generation (kWh)',
+                                    data: new Array(12).fill(0),
+                                    backgroundColor: 'rgba(30, 60, 114, 0.6)',
+                                    borderColor: 'rgba(30, 60, 114, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Generation (kWh)'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        this.log('📊 Charts initialized', 'success');
+                    }
+                } catch (error) {
+                    this.log(`❌ Chart initialization failed: ${error.message}`, 'error');
+                }
+            }
+            
+            setupEventListeners() {
+                // Coordinate inputs
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
+                
+                if (latInput && lngInput) {
+                    latInput.addEventListener('change', () => this.updateLocationFromInputs());
+                    lngInput.addEventListener('change', () => this.updateLocationFromInputs());
+                }
+                
+                // Currency change
+                const currencySelect = document.getElementById('currency');
+                if (currencySelect) {
+                    currencySelect.addEventListener('change', () => this.updateCurrencyDefaults());
+                }
+            }
+            
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Check for Ctrl/Cmd key combinations
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key.toLowerCase()) {
+                            case 'l':
+                                e.preventDefault();
+                                this.toggleSystemLog();
+                                break;
+                            case '1':
+                                e.preventDefault();
+                                this.switchTabProgrammatic('data');
+                                break;
+                            case '2':
+                                e.preventDefault();
+                                this.switchTabProgrammatic('analysis');
+                                break;
+                            case '3':
+                                e.preventDefault();
+                                this.switchTabProgrammatic('results');
+                                break;
+                            case 'r':
+                                e.preventDefault();
+                                if (document.querySelector('#analysis-tab.active')) {
+                                    this.runAnalysis();
+                                }
+                                break;
+                            case 'o':
+                                e.preventDefault();
+                                if (document.querySelector('#analysis-tab.active')) {
+                                    this.optimizeOrientation();
+                                }
+                                break;
+                            case 'e':
+                                e.preventDefault();
+                                this.exportResults();
+                                break;
+                            case 'g':
+                                e.preventDefault();
+                                this.generateReport();
+                                break;
+                        }
+                    }
+                    
+                    // ESC key to close loading spinner
+                    if (e.key === 'Escape') {
+                        this.showLoading(false);
+                    }
+                });
+            }
+            
+            handleMapClick(e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                
+                this.currentLocation = { lat, lng };
+                this.updateCoordinateInputs(lat, lng);
+                this.updateLocationInfo();
+                
+                // Show popup with analysis option
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent(`
+                        <div style="text-align: center; min-width: 150px;">
+                            <strong>📍 Selected Location</strong><br>
+                            <small>${lat.toFixed(4)}, ${lng.toFixed(4)}</small><br>
+                            <button onclick="SolarApp.analyzeLocation()" class="btn" style="margin-top: 8px; font-size: 0.8em;">
+                                ⚡ Quick Analysis
+                            </button>
+                        </div>
+                    `)
+                    .openOn(this.map);
+            }
+            
+            updateCoordinateInputs(lat, lng) {
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
+                
+                if (latInput) latInput.value = lat.toFixed(4);
+                if (lngInput) lngInput.value = lng.toFixed(4);
+                
+                this.updateOptimalTilt(lat);
+            }
+            
+            updateOptimalTilt(latitude) {
+                const optimalTilt = Math.abs(latitude);
+                const optimalTiltElement = document.getElementById('optimalTilt');
+                const tiltInput = document.getElementById('tiltAngle');
+                
+                if (optimalTiltElement) {
+                    optimalTiltElement.textContent = `${Math.round(optimalTilt)}°`;
+                }
+                
+                // Auto-update tilt if it's still default
+                if (tiltInput && Math.abs(parseFloat(tiltInput.value) - 20) < 1) {
+                    tiltInput.value = Math.round(optimalTilt);
+                }
+            }
+            
+            updateLocationFromInputs() {
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
+                
+                if (latInput && lngInput) {
+                    const lat = parseFloat(latInput.value);
+                    const lng = parseFloat(lngInput.value);
+                    
+                    if (!isNaN(lat) && !isNaN(lng) && 
+                        lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                        this.currentLocation = { lat, lng };
+                        this.map.setView([lat, lng], 8);
+                        this.updateLocationInfo();
+                        this.updateOptimalTilt(lat);
+                    }
+                }
+            }
+            
+            updateCurrencyDefaults() {
+                const currency = document.getElementById('currency').value;
+                const systemCostInput = document.getElementById('systemCost');
+                const electricityRateInput = document.getElementById('electricityRate');
+                
+                // Update default values based on currency/region
+                const defaults = {
+                    INR: { systemCost: 65000, electricityRate: 7.5 },
+                    USD: { systemCost: 2500, electricityRate: 0.12 },
+                    EUR: { systemCost: 2200, electricityRate: 0.25 }
+                };
+                
+                if (defaults[currency]) {
+                    if (systemCostInput) systemCostInput.value = defaults[currency].systemCost;
+                    if (electricityRateInput) electricityRateInput.value = defaults[currency].electricityRate;
+                }
+            }
+            
+            updateLocationInfo() {
+                const locationInfoPanel = document.getElementById('locationInfo');
+                const solarResourceElement = document.getElementById('solarResource');
+                const climateZoneElement = document.getElementById('climateZone');
+                
+                if (!locationInfoPanel || !solarResourceElement || !climateZoneElement) return;
+                
+                try {
+                    const solarData = this.getSolarResourceData(this.currentLocation);
+                    
+                    solarResourceElement.textContent = `${solarData.ghi} kWh/m²/year`;
+                    climateZoneElement.textContent = this.getClimateZone(this.currentLocation);
+                    
+                    locationInfoPanel.style.display = 'block';
+                } catch (error) {
+                    this.log(`Error updating location info: ${error.message}`, 'error');
+                }
+            }
+            
+            getSolarResourceData(location) {
+                // Determine region and get solar data
+                const { lat, lng } = location;
+                
+                // India regions
+                if (lat >= 8 && lat <= 37 && lng >= 68 && lng <= 97) {
+                    if (lat >= 24) return { ghi: 1750, dni: 2000, region: 'North India' };
+                    if (lng <= 77) return { ghi: 1850, dni: 2200, region: 'West India' };
+                    return { ghi: 1900, dni: 2300, region: 'South India' };
+                }
+                
+                // Global fallback based on latitude
+                const absLat = Math.abs(lat);
+                if (absLat < 23.5) return { ghi: 2000, dni: 2500, region: 'Tropical' };
+                if (absLat < 35) return { ghi: 1700, dni: 2200, region: 'Subtropical' };
+                return { ghi: 1300, dni: 1800, region: 'Temperate' };
+            }
+            
+            getClimateZone(location) {
+                const { lat } = location;
+                const absLat = Math.abs(lat);
+                
+                if (absLat < 23.5) return 'Tropical';
+                if (absLat < 35) return 'Subtropical';
+                if (absLat < 50) return 'Temperate';
+                return 'Cold';
+            }
+            
+            switchTab(tabName) {
+                try {
+                    // Remove active from all tabs
+                    document.querySelectorAll('.tab-btn').forEach(btn => 
+                        btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => 
+                        content.classList.remove('active'));
+                    
+                    // Activate selected tab
+                    const tabButton = event.target;
+                    const tabContent = document.getElementById(`${tabName}-tab`);
+                    
+                    if (tabButton && tabContent) {
+                        tabButton.classList.add('active');
+                        tabContent.classList.add('active');
+                        this.log(`Switched to ${tabName} tab`, 'info');
+                    }
+                } catch (error) {
+                    this.log(`Error switching tabs: ${error.message}`, 'error');
+                }
+            }
+            
+            selectContinent() {
+                const continentSelect = document.getElementById('continentSelect');
+                if (!continentSelect) return;
+                
+                const continent = continentSelect.value;
+                
+                if (continent === 'global') {
+                    this.map.setView([20, 0], 2);
+                    return;
+                }
+                
+                // Focus on continent
+                const continentCenters = {
+                    asia: [25, 100],
+                    africa: [0, 20], 
+                    europe: [50, 10],
+                    americas: [40, -100],
+                    oceania: [-25, 140]
+                };
+                
+                if (continentCenters[continent]) {
+                    this.map.setView(continentCenters[continent], 3);
+                    this.log(`Focused on ${continent}`, 'info');
+                }
+            }
+            
+            selectIndianLocation() {
+                const select = document.getElementById('indiaLocations');
+                if (!select || !select.value) return;
+                
+                const [lat, lng] = select.value.split(',').map(Number);
+                this.currentLocation = { lat, lng };
+                
+                this.updateCoordinateInputs(lat, lng);
+                this.map.setView([lat, lng], 10);
+                this.updateLocationInfo();
+                
+                this.showNotification(`Location set to ${select.options[select.selectedIndex].text}`, 'success');
+            }
+            
+            getCurrentLocation() {
+                if (navigator.geolocation) {
+                    this.showLoading(true);
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            this.currentLocation = { lat, lng };
+                            this.updateCoordinateInputs(lat, lng);
+                            this.map.setView([lat, lng], 12);
+                            this.updateLocationInfo();
+                            
+                            this.showNotification('Location updated to your current position', 'success');
+                            this.showLoading(false);
+                        },
+                        (error) => {
+                            this.showNotification('Could not get your location', 'error');
+                            this.showLoading(false);
+                        }
+                    );
+                } else {
+                    this.showNotification('Geolocation not supported by this browser', 'warning');
+                }
+            }
+            
+            optimizeOrientation() {
+                const { lat } = this.currentLocation;
+                
+                // Calculate optimal tilt (approximately latitude for fixed systems)
+                const optimalTilt = Math.max(0, Math.min(60, Math.abs(lat)));
+                
+                // Optimal azimuth (180° south for northern hemisphere, 0° north for southern)
+                const optimalAzimuth = lat > 0 ? 180 : 0;
+                
+                // Update inputs
+                const tiltInput = document.getElementById('tiltAngle');
+                const azimuthInput = document.getElementById('azimuth');
+                
+                if (tiltInput) tiltInput.value = Math.round(optimalTilt);
+                if (azimuthInput) azimuthInput.value = optimalAzimuth;
+                
+                this.showNotification(`Orientation optimized: ${Math.round(optimalTilt)}° tilt, ${optimalAzimuth}° azimuth`, 'success');
+                this.log(`Optimized orientation for lat ${lat.toFixed(2)}`, 'info');
+            }
+            
+            runAnalysis() {
+                this.showLoading(true);
+                this.log('🔄 Running solar analysis...', 'info');
+                
+                try {
+                    // Get all input parameters
+                    const params = this.getAnalysisParameters();
+                    
+                    // Validate inputs
+                    if (!this.validateParameters(params)) {
+                        this.showLoading(false);
+                        return;
+                    }
+                    
+                    // Simulate analysis delay
+                    setTimeout(() => {
+                        try {
+                            const results = this.calculateSolarAnalysis(params);
+                            this.displayResults(results);
+                            this.updateChart(results.monthlyGeneration);
+                            this.currentAnalysis = results;
+                            
+                            this.showNotification('Analysis completed successfully!', 'success');
+                            this.log(`✅ Analysis complete: ${results.annualGeneration} kWh/year`, 'success');
+                            
+                            // Switch to results tab
+                            this.switchTabProgrammatic('results');
+                        } catch (error) {
+                            this.showNotification(`Analysis failed: ${error.message}`, 'error');
+                            this.log(`❌ Analysis error: ${error.message}`, 'error');
+                        } finally {
+                            this.showLoading(false);
+                        }
+                    }, 2000);
+                    
+                } catch (error) {
+                    this.showNotification(`Analysis setup failed: ${error.message}`, 'error');
+                    this.showLoading(false);
+                }
+            }
+            
+            getAnalysisParameters() {
+                const getValue = (id, defaultValue = 0) => {
+                    const element = document.getElementById(id);
+                    return element ? parseFloat(element.value) || defaultValue : defaultValue;
+                };
+                
+                const getSelectValue = (id, defaultValue = '') => {
+                    const element = document.getElementById(id);
+                    return element ? element.value : defaultValue;
+                };
+                
+                return {
+                    location: this.currentLocation,
+                    systemSize: getValue('systemSize', 10),
+                    panelType: getSelectValue('panelType', 'mono'),
+                    installationType: getSelectValue('installationType', 'rooftop'),
+                    tiltAngle: getValue('tiltAngle', 20),
+                    azimuth: getValue('azimuth', 180),
+                    currency: getSelectValue('currency', 'INR'),
+                    systemCost: getValue('systemCost', 65000),
+                    electricityRate: getValue('electricityRate', 7.5)
+                };
+            }
+            
+            validateParameters(params) {
+                const validations = [
+                    { condition: params.systemSize > 0, message: 'System size must be greater than 0' },
+                    { condition: params.systemSize <= 1000, message: 'System size too large (max 1000 kW)' },
+                    { condition: params.tiltAngle >= 0 && params.tiltAngle <= 90, message: 'Tilt angle must be 0-90°' },
+                    { condition: params.azimuth >= 0 && params.azimuth <= 360, message: 'Azimuth must be 0-360°' },
+                    { condition: params.systemCost > 0, message: 'System cost must be positive' },
+                    { condition: params.electricityRate > 0, message: 'Electricity rate must be positive' }
+                ];
+                
+                for (const validation of validations) {
+                    if (!validation.condition) {
+                        this.showNotification(validation.message, 'error');
+                        return false;
+                    }
+                }
+                return true;
+            }
+            
+            calculateSolarAnalysis(params) {
+                // Get solar resource data for location
+                const solarData = this.getSolarResourceData(params.location);
+                
+                // Panel efficiency
+                const panelEfficiency = CONSTANTS.PANEL_EFFICIENCIES[params.panelType];
+                
+                // Calculate orientation factors
+                const tiltFactor = this.calculateTiltFactor(params.tiltAngle, params.location.lat);
+                const azimuthFactor = this.calculateAzimuthFactor(params.azimuth, params.location.lat);
+                
+                // Installation type factor
+                const installationFactors = {
+                    rooftop: 0.95,
+                    ground: 1.0,
+                    floating: 1.02
+                };
+                const installationFactor = installationFactors[params.installationType];
+                
+                // Calculate overall system efficiency
+                const systemEfficiency = Object.values(CONSTANTS.SYSTEM_LOSSES).reduce((a, b) => a * b, 1);
+                const overallEfficiency = panelEfficiency * systemEfficiency * tiltFactor * 
+                                        azimuthFactor * installationFactor;
+                
+                // Annual generation calculation
+                const specificYield = solarData.ghi * overallEfficiency; // kWh/kW/year
+                const annualGeneration = Math.round(specificYield * params.systemSize);
+                
+                // Capacity factor
+                const capacityFactor = (specificYield / CONSTANTS.HOURS_IN_YEAR) * 100;
+                
+                // Financial calculations
+                const totalSystemCost = params.systemSize * params.systemCost;
+                const annualSavings = annualGeneration * params.electricityRate;
+                
+                // Simple payback period
+                const paybackPeriod = totalSystemCost / annualSavings;
+                
+                // LCOE calculation (simplified)
+                const lcoe = this.calculateLCOE(totalSystemCost, annualGeneration, params.electricityRate);
+                
+                // Environmental impact
+                const co2Avoided = Math.round(annualGeneration * CONSTANTS.GRID_EMISSION_FACTOR_INDIA);
+                
+                // Monthly generation profile
+                const monthlyGeneration = this.generateMonthlyProfile(annualGeneration, params.location.lat);
+                
+                return {
+                    annualGeneration,
+                    capacityFactor: Math.round(capacityFactor * 10) / 10,
+                    annualSavings: Math.round(annualSavings),
+                    paybackPeriod: Math.round(paybackPeriod * 10) / 10,
+                    lcoe: Math.round(lcoe * 100) / 100,
+                    co2Avoided,
+                    monthlyGeneration,
+                    currency: params.currency,
+                    systemDetails: {
+                        specificYield: Math.round(specificYield),
+                        overallEfficiency: Math.round(overallEfficiency * 100),
+                        solarResource: solarData
+                    }
+                };
+            }
+            
+            calculateTiltFactor(tiltAngle, latitude) {
+                // Simplified tilt factor calculation
+                const optimalTilt = Math.abs(latitude);
+                const tiltDeviation = Math.abs(tiltAngle - optimalTilt);
+                
+                // Cosine loss for tilt deviation
+                return Math.cos(tiltDeviation * Math.PI / 180) * 0.9 + 0.1;
+            }
+            
+            calculateAzimuthFactor(azimuth, latitude) {
+                // Optimal azimuth: 180° for northern hemisphere, 0° for southern
+                const optimalAzimuth = latitude > 0 ? 180 : 0;
+                const azimuthDeviation = Math.abs(azimuth - optimalAzimuth);
+                
+                // Cosine loss for azimuth deviation
+                return Math.cos(azimuthDeviation * Math.PI / 180) * 0.85 + 0.15;
+            }
+            
+            calculateLCOE(capitalCost, annualGeneration, electricityRate) {
+                // Simplified LCOE calculation
+                const annualOM = capitalCost * 0.02; // 2% O&M
+                const totalLifetimeCost = capitalCost + (annualOM * CONSTANTS.PROJECT_LIFETIME_YEARS);
+                const totalLifetimeGeneration = annualGeneration * CONSTANTS.PROJECT_LIFETIME_YEARS * 
+                                              (1 - CONSTANTS.PANEL_DEGRADATION_RATE * CONSTANTS.PROJECT_LIFETIME_YEARS / 2);
+                
+                return totalLifetimeCost / totalLifetimeGeneration;
+            }
+            
+            generateMonthlyProfile(annualGeneration, latitude) {
+                // Seasonal factors based on latitude
+                let monthlyFactors;
+                
+                if (latitude > 0) {
+                    // Northern hemisphere - summer peak
+                    monthlyFactors = [0.7, 0.8, 0.95, 1.1, 1.25, 1.35, 1.4, 1.3, 1.15, 0.95, 0.8, 0.65];
+                } else {
+                    // Southern hemisphere - inverted seasons
+                    monthlyFactors = [1.35, 1.3, 1.15, 0.95, 0.8, 0.65, 0.7, 0.8, 0.95, 1.1, 1.25, 1.4];
+                }
+                
+                // Normalize factors to ensure they sum to 12
+                const sum = monthlyFactors.reduce((a, b) => a + b, 0);
+                const normalizedFactors = monthlyFactors.map(f => f * 12 / sum);
+                
+                return normalizedFactors.map(factor => 
+                    Math.round(annualGeneration * factor / 12)
+                );
+            }
+            
+            displayResults(results) {
+                const currencySymbol = CONSTANTS.CURRENCY_SYMBOLS[results.currency] || '';
+                
+                this.updateElement('annualGeneration', `${results.annualGeneration.toLocaleString()} kWh`);
+                this.updateElement('capacityFactor', `${results.capacityFactor}%`);
+                this.updateElement('annualSavings', `${currencySymbol}${results.annualSavings.toLocaleString()}`);
+                this.updateElement('paybackPeriod', `${results.paybackPeriod} years`);
+                this.updateElement('lcoe', `${currencySymbol}${results.lcoe}/kWh`);
+                this.updateElement('co2Avoided', `${results.co2Avoided.toLocaleString()} kg/year`);
+            }
+            
+            updateElement(id, value) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+            
+            updateChart(monthlyData) {
+                if (this.monthlyChart && monthlyData) {
+                    this.monthlyChart.data.datasets[0].data = monthlyData;
+                    this.monthlyChart.update();
+                }
+            }
+            
+            switchTabProgrammatic(tabName) {
+                // Remove active from all
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Find and activate the target tab
+                const tabs = document.querySelectorAll('.tab-btn');
+                const tabNames = ['data', 'analysis', 'results'];
+                const targetIndex = tabNames.indexOf(tabName);
+                
+                if (targetIndex >= 0 && tabs[targetIndex]) {
+                    tabs[targetIndex].classList.add('active');
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                }
+            }
+            
+            analyzeLocation() {
+                // Quick analysis with current location
+                this.map.closePopup();
+                
+                // Auto-switch to analysis tab and run
+                this.switchTabProgrammatic('analysis');
+                setTimeout(() => this.runAnalysis(), 500);
+            }
+            
+            exportResults() {
+                if (!this.currentAnalysis) {
+                    this.showNotification('No analysis results to export', 'warning');
+                    return;
+                }
+                
+                try {
+                    const exportData = {
+                        timestamp: new Date().toISOString(),
+                        location: this.currentLocation,
+                        parameters: this.getAnalysisParameters(),
+                        results: this.currentAnalysis,
+                        metadata: {
+                            version: '2.0',
+                            platform: 'Solar Analysis Platform'
+                        }
+                    };
+                    
+                    const dataStr = JSON.stringify(exportData, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                    
+                    const fileName = `solar_analysis_${new Date().toISOString().split('T')[0]}.json`;
+                    
+                    const link = document.createElement('a');
+                    link.setAttribute('href', dataUri);
+                    link.setAttribute('download', fileName);
+                    link.click();
+                    
+                    this.showNotification('Results exported successfully', 'success');
+                    this.log('📥 Results exported to JSON', 'success');
+                    
+                } catch (error) {
+                    this.showNotification('Export failed: ' + error.message, 'error');
+                    this.log(`❌ Export error: ${error.message}`, 'error');
+                }
+            }
+            
+            generateReport() {
+                if (!this.currentAnalysis) {
+                    this.showNotification('No analysis results to generate report', 'warning');
+                    return;
+                }
+                
+                const results = this.currentAnalysis;
+                const params = this.getAnalysisParameters();
+                const currencySymbol = CONSTANTS.CURRENCY_SYMBOLS[results.currency] || '';
+                
+                const reportHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Solar Analysis Report</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+                            .header { text-align: center; margin-bottom: 40px; color: #1e3c72; }
+                            .section { margin: 30px 0; }
+                            .metric { display: inline-block; margin: 10px 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+                            .location { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                            @media print { body { margin: 20px; } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>☀️ Solar Energy Analysis Report</h1>
+                            <p>Generated on ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        
+                        <div class="location">
+                            <h3>📍 Project Location</h3>
+                            <p><strong>Coordinates:</strong> ${this.currentLocation.lat.toFixed(4)}°, ${this.currentLocation.lng.toFixed(4)}°</p>
+                            <p><strong>Solar Resource:</strong> ${results.systemDetails.solarResource.ghi} kWh/m²/year</p>
+                            <p><strong>Climate Zone:</strong> ${this.getClimateZone(this.currentLocation)}</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>⚙️ System Configuration</h3>
+                            <div class="metric"><strong>System Size:</strong> ${params.systemSize} kW</div>
+                            <div class="metric"><strong>Panel Type:</strong> ${params.panelType}</div>
+                            <div class="metric"><strong>Installation:</strong> ${params.installationType}</div>
+                            <div class="metric"><strong>Orientation:</strong> ${params.tiltAngle}° tilt, ${params.azimuth}° azimuth</div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>⚡ Performance Results</h3>
+                            <div class="metric"><strong>Annual Generation:</strong> ${results.annualGeneration.toLocaleString()} kWh</div>
+                            <div class="metric"><strong>Capacity Factor:</strong> ${results.capacityFactor}%</div>
+                            <div class="metric"><strong>Specific Yield:</strong> ${results.systemDetails.specificYield} kWh/kW</div>
+                            <div class="metric"><strong>System Efficiency:</strong> ${results.systemDetails.overallEfficiency}%</div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>💰 Financial Analysis</h3>
+                            <div class="metric"><strong>Annual Savings:</strong> ${currencySymbol}${results.annualSavings.toLocaleString()}</div>
+                            <div class="metric"><strong>Payback Period:</strong> ${results.paybackPeriod} years</div>
+                            <div class="metric"><strong>LCOE:</strong> ${currencySymbol}${results.lcoe}/kWh</div>
+                            <div class="metric"><strong>System Cost:</strong> ${currencySymbol}${(params.systemSize * params.systemCost).toLocaleString()}</div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>🌱 Environmental Impact</h3>
+                            <div class="metric"><strong>CO₂ Avoided:</strong> ${results.co2Avoided.toLocaleString()} kg/year</div>
+                            <div class="metric"><strong>25-Year CO₂ Reduction:</strong> ${(results.co2Avoided * 25).toLocaleString()} kg</div>
+                        </div>
+                        
+                        <div class="section" style="margin-top: 40px; text-align: center; font-size: 0.9em; color: #666;">
+                            <p><em>Report generated by Solar Analysis Platform</em></p>
+                            <p>Analysis based on location-specific solar resource data and industry-standard calculations</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(reportHTML);
+                newWindow.document.close();
+                
+                this.showNotification('Report generated successfully', 'success');
+                this.log('📄 Report generated', 'success');
+            }
+            
+            toggleSystemLog() {
+                const monitor = document.getElementById('apiMonitor');
+                const toggleBtn = document.getElementById('logToggleBtn');
+                
+                if (!monitor || !toggleBtn) return;
+                
+                this.isLogCollapsed = !this.isLogCollapsed;
+                
+                if (this.isLogCollapsed) {
+                    monitor.classList.add('collapsed');
+                    toggleBtn.textContent = '+';
+                    toggleBtn.title = 'Show system log';
+                } else {
+                    monitor.classList.remove('collapsed');
+                    toggleBtn.textContent = '−';
+                    toggleBtn.title = 'Hide system log';
+                }
+                
+                this.log(`System log ${this.isLogCollapsed ? 'collapsed' : 'expanded'}`, 'info');
+            }
+            
+            showLoading(show) {
+                const spinner = document.getElementById('loadingSpinner');
+                if (spinner) {
+                    spinner.style.display = show ? 'flex' : 'none';
+                }
+            }
+            
+            showNotification(message, type = 'info') {
+                try {
+                    const notification = document.createElement('div');
+                    notification.className = `notification ${type} show`;
+                    notification.textContent = message;
+                    
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        setTimeout(() => {
+                            if (document.body.contains(notification)) {
+                                document.body.removeChild(notification);
+                            }
+                        }, 300);
+                    }, 4000);
+                } catch (error) {
+                    console.error('Notification error:', error);
+                }
+            }
+            
+            log(message, type = 'info') {
+                try {
+                    const timestamp = new Date().toLocaleTimeString();
+                    const colors = {
+                        info: '#2196f3',
+                        success: '#4caf50', 
+                        error: '#f44336',
+                        warning: '#ff9800'
+                    };
+                    
+                    const log = document.createElement('div');
+                    log.className = 'api-log';
+                    log.innerHTML = `<span style="color: ${colors[type]}">[${timestamp}]</span> ${message}`;
+                    
+                    const logsContainer = document.getElementById('apiLogs');
+                    if (logsContainer) {
+                        logsContainer.appendChild(log);
+                        logsContainer.scrollTop = logsContainer.scrollHeight;
+                        
+                        // Keep only last 15 logs
+                        while (logsContainer.children.length > 15) {
+                            logsContainer.removeChild(logsContainer.firstChild);
+                        }
+                    }
+                    
+                    // Also log to console
+                    console.log(`[${type.toUpperCase()}] ${message}`);
+                    
+                } catch (error) {
+                    console.error('Logging error:', error);
+                }
+            }
+        }
+
+        // Initialize the application
+        let SolarApp;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                SolarApp = new SolarAnalysisPlatform();
+                
+                // Add help tooltip
+                setTimeout(() => {
+                    if (SolarApp) {
+                        SolarApp.showNotification('💡 Tip: Use Ctrl+L to toggle system log, Ctrl+1-3 for tabs', 'info');
+                    }
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Failed to initialize Solar Analysis Platform:', error);
+                alert('Failed to load the application. Please refresh the page.');
+            }
+        });
+        
+        // Global error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            if (SolarApp) {
+                SolarApp.log(`System error: ${e.message}`, 'error');
+            }
+        });
+        
+    </script>
+</body>
+</html>
