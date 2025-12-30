@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrivoltaic Systems | EcoSphere AgTech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Page Specific Overrides/Additions */
+        .hero.solar-hero {
+            background-image: url('assets/solar_detail_hero.png');
+            height: 70vh;
+        }
+
+        .content-section {
+            padding: 100px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .split-text h2 {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+
+        .split-text p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .split-image img {
+            width: 100%;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Process Steps */
+        .process-flow {
+            margin-top: 50px;
+        }
+
+        .flow-step-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        /* Alternating layout */
+        .flow-step-container:nth-child(even) {
+            direction: rtl;
+        }
+
+        .flow-step-container:nth-child(even) .step-text {
+            direction: ltr;
+            /* Reset text direction */
+        }
+
+        .step-image {
+            height: 350px;
+            border-radius: 20px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .step-text {
+            padding: 20px;
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent);
+            opacity: 0.2;
+            line-height: 1;
+            margin-bottom: -20px;
+            position: relative;
+            z-index: 0;
+        }
+
+        .step-content h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--text-white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-content p {
+            color: var(--text-gray);
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* ROI Section */
+        .roi-section {
+            background: var(--secondary-bg);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 60px auto 0;
+            padding: 0 50px;
+        }
+
+        .roi-card {
+            background: var(--primary-bg);
+            padding: 40px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .roi-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .roi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Comparison Table */
+        .comparison-section {
+            padding: 100px 80px;
+            background: var(--dark-bg);
+        }
+
+        .comp-table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 60px auto 0;
+            border-collapse: collapse;
+            color: var(--text-gray);
+        }
+
+        .comp-table th,
+        .comp-table td {
+            text-align: left;
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comp-table th {
+            font-size: 1.2rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .comp-table th.high-light {
+            color: var(--accent);
+        }
+
+        .comp-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .check-icon {
+            color: var(--accent);
+        }
+
+        .times-icon {
+            color: #e74c3c;
+        }
+
+        /* Video Section */
+        .video-section {
+            padding: 100px 80px;
+            text-align: center;
+        }
+
+        .video-wrapper {
+            max-width: 1200px;
+            height: 600px;
+            margin: 40px auto 0;
+            border-radius: 40px;
+            background-image: url('assets/card_solar.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .video-wrapper:hover .video-overlay {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .play-btn {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .play-btn i {
+            font-size: 2.5rem;
+            color: white;
+            margin-left: 5px;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .cta-section {
+            padding: 120px 0;
+            text-align: center;
+            background: linear-gradient(to top, #000, var(--primary-bg));
+        }
+
+        .cta-btn-large {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--secondary-bg);
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 40px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(108, 168, 163, 0.3);
+        }
+
+        .cta-btn-large:hover {
+            transform: scale(1.05);
+            background: white;
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Professional Glass Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">
+            <a href="index.html"
+                style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-leaf" style="color: var(--accent);"></i> EcoSphere
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#solutions">Solutions</a>
+            <a href="index.html#technology">Technology</a>
+            <a href="about.html">About</a>
+            <a href="#" class="btn-connect">Request Quote</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero solar-hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span
+                style="color: var(--accent); letter-spacing: 3px; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; display: block;">Energy
+                + Food</span>
+            <h1>Harvesting the Sun</h1>
+            <p class="subtitle">MAXIMIZING LAND USE EFFICIENCY.</p>
+        </div>
+    </section>
+
+    <!-- The Problem & Solution -->
+    <section class="content-section">
+        <div class="split-layout">
+            <div class="split-text reveal">
+                <h2>The Land Competition</h2>
+                <p>The world needs more renewable energy and more food, but they often compete for the same arable land.
+                    Covering farm fields with standard opaque solar panels kills the crops underneath, forcing a choice
+                    between food and power.</p>
+
+                <h2 style="margin-top: 50px;">The Agrivoltaic Solution</h2>
+                <p> EcoSphere's Agrivoltaic systems use <strong>Semi-Transparent Smart Glass</strong> that generates
+                    power while letting the "growing spectrum" of light pass through to the plants. It's not a
+                    compromise; it's an optimization.</p>
+
+                <ul style="list-style: none; margin-top: 20px; color: var(--text-gray);">
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Protection from Extreme Heat</li>
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Reduced Water Evaporation</li>
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Carbon Negative Farming</li>
+                </ul>
+            </div>
+            <div class="split-image reveal">
+                <img src="assets/solar_process_diagram.png" alt="Light Spectrum Diagram">
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section reveal">
+        <div class="section-head-center">
+            <h2>Dual Harvest</h2>
+            <p>See how our pilot farms produce significantly more revenue per acre.</p>
+        </div>
+        <div class="video-wrapper">
+            <div class="video-overlay">
+                <div class="play-btn">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+            </div>
+            <!-- Text on video -->
+            <div style="position: absolute; bottom: 30px; left: 40px; z-index: 2;">
+                <h3 style="margin-bottom: 5px;">Arizona Desert Proving Grounds</h3>
+                <p style="opacity: 0.8; font-size: 0.9rem;">Duration: 3:45</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Detailed Process Flow -->
+    <section class="process-section" style="background: var(--dark-bg); padding-bottom: 50px;">
+        <div class="section-head-center reveal">
+            <h2>How It Works</h2>
+            <p>Filtering light for maximum biological and electrical efficiency.</p>
+        </div>
+
+        <div class="content-section" style="padding-top: 20px;">
+            <div class="process-flow">
+                <!-- Step 1 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image" style="background-image: url('assets/solar_process_diagram.png');"></div>
+                    <div class="step-text">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h3>Spectrum Splitting</h3>
+                            <p>Plants mainly use red and blue light for photosynthesis. Our panels absorb the
+                                high-energy UV and heat-generating Infrared light to create electricity, while letting
+                                the visible PAR spectrum pass through.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image"
+                        style="background-image: url('assets/solar_tech_viz.png'); max-width: 90%; margin: 0 auto; background-size: contain; background-repeat: no-repeat;">
+                    </div>
+                    <div class="step-text">
+                        <div class="step-number">02</div>
+                        <div class="step-content">
+                            <h3>Microclimate Control</h3>
+                            <p>The panels act as a shield against hail, heavy rain, and scorching midday sun. This
+                                creates a milder microclimate underneath, reducing plant stress and watering needs by up
+                                to 30%.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image" style="background-image: url('assets/solar_detail_hero.png');"></div>
+                    <div class="step-text">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h3>Energy Independence</h3>
+                            <p>The generated power runs all farm operations—pumps, sensors, and processing equipment.
+                                Any excess energy is stored in batteries or sold back to the grid, turning an expense
+                                into income.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Dive -->
+                <div class="technical-deep-dive reveal"
+                    style="margin-top: 80px; background: rgba(255,255,255,0.03); padding: 40px; border-radius: 20px;">
+                    <h3 style="color: var(--accent); margin-bottom: 30px; font-size: 2rem;">Technical Deep Dive: The
+                        Physics of Dual-Use</h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <h4 style="color: white; margin-bottom: 15px;">Photosynthetic Selectivity</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 20px;">
+                                Not all light is created equal. Plants primarily use the 400-700nm (PAR) range.
+                                Our semi-transparent Organic PV (OPV) cells filter out harmful UV-B and heat-carrying
+                                Infrared radiation
+                                to generate power, passing the "Good Light" to the canopy below. This acts as "optical
+                                fertilizer."
+                            </p>
+
+                            <h4 style="color: white; margin-bottom: 15px;">Dynamic Tracking Algorithms</h4>
+                            <p style="color: var(--text-gray);">
+                                Standard solar farms track the sun for max power. Our AI tracks the sun for <strong>Max
+                                    System Yield</strong>.
+                                If crop sensors detect heat stress, the panels tilt to provide shade (sacrificing 5%
+                                power for 20% crop survival).
+                                If it's cloudy, they tilt to let maximum light through.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 style="color: white; margin-bottom: 15px;">The Overyielding Effect</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 20px;">
+                                By lowering the soil temperature by 5-10°C, we reduce evapotranspiration significantly.
+                                This allows crops to keep their stomata open longer during the day for CO2 intake,
+                                leading to
+                                faster growth despite lower total light intensity. This is the "shade advantage."
+                            </p>
+                            <h4 style="color: white; margin-bottom: 15px;">Bifacial Energy Capture</h4>
+                            <p style="color: var(--text-gray);">
+                                We use frameless, glass-glass bifacial modules. They capture direct sunlight from above
+                                and
+                                <em>albedo</em> (reflected) light from the crops below. Green crops are surprisingly
+                                reflective ($20\% albedo$),
+                                boosting energy generation by an additional 10-15% compared to monofacial panels.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="comparison-section">
+        <div class="section-head-center reveal">
+            <h2>System Comparison</h2>
+            <p>Standard Field vs. Agrivoltaic Setup.</p>
+        </div>
+
+        <table class="comp-table reveal">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Standard Farm</th>
+                    <th class="high-light">Agrivoltaic Farm</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Revenue Sources</td>
+                    <td>Crops Only</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Crops + Electricity</td>
+                </tr>
+                <tr>
+                    <td>Water Consumption</td>
+                    <td>High (Evaporation)</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> -30% (Shaded)</td>
+                </tr>
+                <tr>
+                    <td>Heat Stress</td>
+                    <td><i class="times-icon fa-solid fa-xmark"></i> High Risk</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Protected</td>
+                </tr>
+                <tr>
+                    <td>Grid Impact</td>
+                    <td>Consumer</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Producer</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ROI / Sales Pitch -->
+    <section class="roi-section">
+        <div class="section-head-center reveal">
+            <h2>Double The Yield</h2>
+            <p>Financial stability through diversified income streams.</p>
+        </div>
+
+        <div class="roi-grid reveal">
+            <div class="roi-card">
+                <span class="roi-value">+60%</span>
+                <p>Total Land Productivity</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">5 Yrs</span>
+                <p>Energy Payback Time</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">Zero</span>
+                <p>Net Carbon Emissions</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">Tax</span>
+                <p>Eligible for Green Credits</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI Calculator -->
+    <section class="calculator-section reveal">
+        <div class="section-head-center">
+            <h2>Calculate Your Impact</h2>
+            <p>Estimate the potential yield and revenue for your facility.</p>
+        </div>
+        <div class="calculator-box">
+            <div class="calc-inputs">
+                <div class="form-group">
+                    <label>Facility Size (Sq Ft)</label>
+                    <input type="number" id="calc-space" placeholder="e.g. 5000">
+                </div>
+                <div class="form-group">
+                    <label>Primary Crop</label>
+                    <select id="calc-crop">
+                        <option value="lettuce">Leafy Greens</option>
+                        <option value="basil">Herbs</option>
+                        <option value="tomatoes">Vining Crops</option>
+                        <option value="tilapia">Fish Stock</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="calculateROI()">Calculate Potential</button>
+            </div>
+            <div class="calc-results" id="calculator-results">
+                <div class="result-item">
+                    <span>Est. Annual Yield</span>
+                    <div class="result-val" id="result-yield">0</div>
+                    <span style="display:inline; font-size: 1rem;">lbs</span>
+                </div>
+                <div class="result-item">
+                    <span>Est. Gross Revenue</span>
+                    <div class="result-val" id="result-revenue">$0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section reveal">
+        <h2 style="font-size: 3.5rem; margin-bottom: 20px;">Power Your Farm</h2>
+        <p style="font-size: 1.2rem; color: var(--text-gray); max-width: 600px; margin: 0 auto;">Install the future of
+            energy-positive agriculture.</p>
+        <a href="#" class="cta-btn-large">Calculate Your Energy Savings</a>
+        <br>
+        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.6;">Or call our sales team: +1 (800) 555-0199</p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2><i class="fa-solid fa-leaf"></i> EcoSphere</h2>
+                <p>Pioneering the future of food through technology, sustainability, and innovation.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Solutions</h4>
+                <ul>
+                    <li><a href="aquafarming.html">Aquaculture</a></li>
+                    <li><a href="hydrofarming.html">Hydroponics</a></li>
+                    <li><a href="integrated_farming.html">Integrated Farming</a></li>
+                    <li><a href="agrivoltaics.html">Agrivoltaics</a></li>
+                    <li><a href="indoor_farming.html">Indoor Farming</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 EcoSphere AgTech. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="calculator.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

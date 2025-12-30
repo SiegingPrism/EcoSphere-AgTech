@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrated Farming | EcoSphere AgTech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Page Specific Overrides/Additions */
+        .hero.integrated-hero {
+            background-image: url('assets/integrated_detail_hero.png');
+            height: 70vh;
+        }
+
+        .content-section {
+            padding: 100px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .split-text h2 {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+
+        .split-text p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .split-image img {
+            width: 100%;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Process Steps */
+        .process-flow {
+            margin-top: 50px;
+        }
+
+        .flow-step-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        /* Alternating layout */
+        .flow-step-container:nth-child(even) {
+            direction: rtl;
+        }
+
+        .flow-step-container:nth-child(even) .step-text {
+            direction: ltr;
+            /* Reset text direction */
+        }
+
+        .step-image {
+            height: 350px;
+            border-radius: 20px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .step-text {
+            padding: 20px;
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent);
+            opacity: 0.2;
+            line-height: 1;
+            margin-bottom: -20px;
+            position: relative;
+            z-index: 0;
+        }
+
+        .step-content h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--text-white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-content p {
+            color: var(--text-gray);
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* ROI Section */
+        .roi-section {
+            background: var(--secondary-bg);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 60px auto 0;
+            padding: 0 50px;
+        }
+
+        .roi-card {
+            background: var(--primary-bg);
+            padding: 40px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .roi-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .roi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Comparison Table */
+        .comparison-section {
+            padding: 100px 80px;
+            background: var(--dark-bg);
+        }
+
+        .comp-table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 60px auto 0;
+            border-collapse: collapse;
+            color: var(--text-gray);
+        }
+
+        .comp-table th,
+        .comp-table td {
+            text-align: left;
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comp-table th {
+            font-size: 1.2rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .comp-table th.high-light {
+            color: var(--accent);
+        }
+
+        .comp-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .check-icon {
+            color: var(--accent);
+        }
+
+        .times-icon {
+            color: #e74c3c;
+        }
+
+        /* Video Section */
+        .video-section {
+            padding: 100px 80px;
+            text-align: center;
+        }
+
+        .video-wrapper {
+            max-width: 1200px;
+            height: 600px;
+            margin: 40px auto 0;
+            border-radius: 40px;
+            background-image: url('assets/integrated_detail_hero.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .video-wrapper:hover .video-overlay {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .play-btn {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .play-btn i {
+            font-size: 2.5rem;
+            color: white;
+            margin-left: 5px;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .cta-section {
+            padding: 120px 0;
+            text-align: center;
+            background: linear-gradient(to top, #000, var(--primary-bg));
+        }
+
+        .cta-btn-large {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--secondary-bg);
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 40px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(108, 168, 163, 0.3);
+        }
+
+        .cta-btn-large:hover {
+            transform: scale(1.05);
+            background: white;
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Professional Glass Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">
+            <a href="index.html"
+                style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-leaf" style="color: var(--accent);"></i> EcoSphere
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#solutions">Solutions</a>
+            <a href="index.html#technology">Technology</a>
+            <a href="#" class="active">Integrated Systems</a>
+            <a href="about.html">About</a>
+            <a href="#" class="btn-connect">Request Quote</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero integrated-hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span
+                style="color: var(--accent); letter-spacing: 3px; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; display: block;">Symbiotic
+                Ecosystems</span>
+            <h1>Nature's Perfect Balance</h1>
+            <p class="subtitle">FISH FEED PLANTS. PLANTS CLEAN WATER.</p>
+        </div>
+    </section>
+
+    <!-- The Problem & Solution -->
+    <section class="content-section">
+        <div class="split-layout">
+            <div class="split-text reveal">
+                <h2>The Disconnect</h2>
+                <p>Industrial farming separates animals and plants. This breaks the natural cycle, leading to toxic
+                    waste
+                    lagoons from animal farms and the need for synthetic fertilizers for crops. It's a linear system in
+                    a circular world.</p>
+
+                <h2 style="margin-top: 50px;">The Aquaponic Loop</h2>
+                <p><strong>Integrated Farming</strong> reconnects the circle. The nutrient-rich waste from our fish
+                    becomes organic food for the plants. The plants, in turn, filter and purify the water, sending it
+                    back to the fish tanks sparkling clean. It's zero-waste agriculture.</p>
+
+                <ul style="list-style: none; margin-top: 20px; color: var(--text-gray);">
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Dual Revenue Stream (Fish + Veg)</li>
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> 100% Organic Inputs</li>
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Self-Balancing Ecosystem</li>
+                </ul>
+            </div>
+            <div class="split-image reveal">
+                <img src="assets/integrated_process_diagram.png" alt="Closed Loop Diagram">
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section reveal">
+        <div class="section-head-center">
+            <h2>Harmony in Motion</h2>
+            <p>Watch the complete nitrogen cycle operating at scale.</p>
+        </div>
+        <div class="video-wrapper">
+            <div class="video-overlay">
+                <div class="play-btn">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+            </div>
+            <!-- Text on video -->
+            <div style="position: absolute; bottom: 30px; left: 40px; z-index: 2;">
+                <h3 style="margin-bottom: 5px;">Singapore Biosphere</h3>
+                <p style="opacity: 0.8; font-size: 0.9rem;">Duration: 4:20</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Detailed Process Flow -->
+    <section class="process-section" style="background: var(--dark-bg); padding-bottom: 50px;">
+        <div class="section-head-center reveal">
+            <h2>The Biological Engine</h2>
+            <p>Three organisms working in concert.</p>
+        </div>
+
+        <div class="content-section" style="padding-top: 20px;">
+            <div class="process-flow">
+                <!-- Step 1 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image" style="background-image: url('assets/card_aqua.png');"></div>
+                    <div class="step-text">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h3>Ammonia Production</h3>
+                            <p>It starts with the fish. Tilapia or Barramundi are fed high-quality feed. Their natural
+                                metabolic waste excretes ammonia into the water. In a normal tank, this would key
+                                toxicity, but here, it's fuel.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image"
+                        style="background-image: url('assets/integrated_tech_viz.png'); max-width: 90%; margin: 0 auto; background-size: contain; background-repeat: no-repeat;">
+                    </div>
+                    <div class="step-text">
+                        <div class="step-number">02</div>
+                        <div class="step-content">
+                            <h3>Bacterial Conversion</h3>
+                            <p>Our bio-filters are home to colonies of Nitrosomonas and Nitrobacter. These "engine"
+                                bacteria convert ammonia first into nitrites, and then into nitrates—the primary form of
+                                nitrogen that plants crave.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image" style="background-image: url('assets/integrated_detail_hero.png');"></div>
+                    <div class="step-text">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h3>Plant Filtration</h3>
+                            <p>The nitrate-rich water floods the hydroponic grow beds. Plants like basil, lettuce, and
+                                tomatoes strip the nitrogen from the water to grow rapidly. The result? Crystal clear
+                                water returns to the fish tank.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Dive -->
+                <div class="technical-deep-dive reveal"
+                    style="margin-top: 80px; background: rgba(255,255,255,0.03); padding: 40px; border-radius: 20px;">
+                    <h3 style="color: var(--accent); margin-bottom: 30px; font-size: 2rem;">Technical Deep Dive: The
+                        Symbiotic Loop</h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <h4 style="color: white; margin-bottom: 15px;">Advanced Nitrogen Cycle</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 20px;">
+                                The magic isn't just "fish poop to plants." It's a multi-stage bio-chemical process:
+                                <br>1. <strong>Ammonification:</strong> Fish excrete
+                                NH<sub>3</sub>/NH<sub>4</sub><sup>+</sup>.
+                                <br>2. <strong>Nitrification Part A:</strong> <em>Nitrosomonas</em> bacteria oxidize
+                                Ammonia to Nitrite (NO<sub>2</sub><sup>-</sup>).
+                                <br>3. <strong>Nitrification Part B:</strong> <em>Nitrospira</em> bacteria oxidize
+                                Nitrite to Nitrate (NO<sub>3</sub><sup>-</sup>).
+                                <br>4. <strong>Assimilation:</strong> Plant roots absorb Nitrate to build proteins and
+                                chlorophyll.
+                            </p>
+
+                            <h4 style="color: white; margin-bottom: 15px;">Decoupled Design</h4>
+                            <p style="color: var(--text-gray);">
+                                Traditional aquaponics forces a compromise on pH (Fish assume 7.0, Plants want 6.0).
+                                EcoSphere uses a <strong>Decoupled System</strong>. We can isolate the fish loop from
+                                the plant loop
+                                via a one-way valve, allowing us to lower the pH for the plants tailored specifically
+                                for nutrient
+                                uptake without stressing the fish stock.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 style="color: white; margin-bottom: 15px;">Mineralization of Solids</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 20px;">
+                                Fish waste contains more than just nitrogen. We capture solid waste in radial flow
+                                settlers
+                                and process it in "mineralization tanks." Heterotrophic bacteria break these solids down
+                                over
+                                14-21 days, releasing locked phosphorus, potassium, and calcium back into liquid form
+                                for the plants—organic liquid gold.
+                            </p>
+                            <h4 style="color: white; margin-bottom: 15px;">Natural Pest Defense</h4>
+                            <p style="color: var(--text-gray);">
+                                In a sterile lab, one pest can ruin a crop. In an ecosystem, we have defenders.
+                                We integrate beneficial insects (like ladybugs and parasitic wasps) and companion
+                                planting
+                                (like marigolds) to create a persistent biological immune system that hunts down pests
+                                naturally.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="comparison-section">
+        <div class="section-head-center reveal">
+            <h2>System Comparison</h2>
+            <p>Linear vs. Circular Economies.</p>
+        </div>
+
+        <table class="comp-table reveal">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Separate Farming</th>
+                    <th class="high-light">Integrated EcoSphere</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Inputs Required</td>
+                    <td>Fish Feed + Fertilizer</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Fish Feed Only</td>
+                </tr>
+                <tr>
+                    <td>Waste Output</td>
+                    <td>Polluted Runoff</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Zero Discharge</td>
+                </tr>
+                <tr>
+                    <td>Chemicals</td>
+                    <td><i class="times-icon fa-solid fa-xmark"></i> Herbicides/Pesticides</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Natural Biocontrol</td>
+                </tr>
+                <tr>
+                    <td>Productivity</td>
+                    <td>Single Yield</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Double Yield (Fish+Veg)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ROI / Sales Pitch -->
+    <section class="roi-section">
+        <div class="section-head-center reveal">
+            <h2>The Synergistic Advantage</h2>
+            <p>Lower costs and higher margins through biological efficiency.</p>
+        </div>
+
+        <div class="roi-grid reveal">
+            <div class="roi-card">
+                <span class="roi-value">-40%</span>
+                <p>Lower OpEx (No Fertilizer)</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">2x</span>
+                <p>Revenue Sources</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">100%</span>
+                <p>Organic Certification Ready</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">Zero</span>
+                <p>Chemical Discharge Fines</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI Calculator -->
+    <section class="calculator-section reveal">
+        <div class="section-head-center">
+            <h2>Calculate Your Impact</h2>
+            <p>Estimate the potential yield and revenue for your facility.</p>
+        </div>
+        <div class="calculator-box">
+            <div class="calc-inputs">
+                <div class="form-group">
+                    <label>Facility Size (Sq Ft)</label>
+                    <input type="number" id="calc-space" placeholder="e.g. 5000">
+                </div>
+                <div class="form-group">
+                    <label>Primary Crop</label>
+                    <select id="calc-crop">
+                        <option value="lettuce">Leafy Greens</option>
+                        <option value="basil">Herbs</option>
+                        <option value="tomatoes">Vining Crops</option>
+                        <option value="tilapia">Fish Stock</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="calculateROI()">Calculate Potential</button>
+            </div>
+            <div class="calc-results" id="calculator-results">
+                <div class="result-item">
+                    <span>Est. Annual Yield</span>
+                    <div class="result-val" id="result-yield">0</div>
+                    <span style="display:inline; font-size: 1rem;">lbs</span>
+                </div>
+                <div class="result-item">
+                    <span>Est. Gross Revenue</span>
+                    <div class="result-val" id="result-revenue">$0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section reveal">
+        <h2 style="font-size: 3.5rem; margin-bottom: 20px;">Balance Your Business</h2>
+        <p style="font-size: 1.2rem; color: var(--text-gray); max-width: 600px; margin: 0 auto;">Join the circular
+            revolution and profit from sustainability.</p>
+        <a href="#" class="cta-btn-large">Request Integration Assessment</a>
+        <br>
+        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.6;">Or call our sales team: +1 (800) 555-0199</p>
+    </section>
+
+    <!-- Footer (Same as Home) -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2><i class="fa-solid fa-leaf"></i> EcoSphere</h2>
+                <p>Pioneering the future of food through technology, sustainability, and innovation.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Solutions</h4>
+                <ul>
+                    <li><a href="aquafarming.html">Aquaculture</a></li>
+                    <li><a href="hydrofarming.html">Hydroponics</a></li>
+                    <li><a href="integrated_farming.html">Integrated Farming</a></li>
+                    <li><a href="agrivoltaics.html">Agrivoltaics</a></li>
+                    <li><a href="indoor_farming.html">Indoor Farming</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 EcoSphere AgTech. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="calculator.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indoor Container Farming | EcoSphere AgTech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Page Specific Overrides/Additions */
+        .hero.indoor-hero {
+            background-image: url('assets/indoor_detail_hero.png');
+            height: 70vh;
+        }
+
+        .content-section {
+            padding: 100px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .split-text h2 {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+
+        .split-text p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .split-image img {
+            width: 100%;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Process Steps */
+        .process-flow {
+            margin-top: 50px;
+        }
+
+        .flow-step-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        /* Alternating layout */
+        .flow-step-container:nth-child(even) {
+            direction: rtl;
+        }
+
+        .flow-step-container:nth-child(even) .step-text {
+            direction: ltr;
+            /* Reset text direction */
+        }
+
+        .step-image {
+            height: 350px;
+            border-radius: 20px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .step-text {
+            padding: 20px;
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent);
+            opacity: 0.2;
+            line-height: 1;
+            margin-bottom: -20px;
+            position: relative;
+            z-index: 0;
+        }
+
+        .step-content h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--text-white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-content p {
+            color: var(--text-gray);
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* ROI Section */
+        .roi-section {
+            background: var(--secondary-bg);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 60px auto 0;
+            padding: 0 50px;
+        }
+
+        .roi-card {
+            background: var(--primary-bg);
+            padding: 40px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .roi-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .roi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Comparison Table */
+        .comparison-section {
+            padding: 100px 80px;
+            background: var(--dark-bg);
+        }
+
+        .comp-table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 60px auto 0;
+            border-collapse: collapse;
+            color: var(--text-gray);
+        }
+
+        .comp-table th,
+        .comp-table td {
+            text-align: left;
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comp-table th {
+            font-size: 1.2rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .comp-table th.high-light {
+            color: var(--accent);
+        }
+
+        .comp-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .check-icon {
+            color: var(--accent);
+        }
+
+        .times-icon {
+            color: #e74c3c;
+        }
+
+        /* Video Section */
+        .video-section {
+            padding: 100px 80px;
+            text-align: center;
+        }
+
+        .video-wrapper {
+            max-width: 1200px;
+            height: 600px;
+            margin: 40px auto 0;
+            border-radius: 40px;
+            background-image: url('assets/indoor_detail_hero.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .video-wrapper:hover .video-overlay {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .play-btn {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .play-btn i {
+            font-size: 2.5rem;
+            color: white;
+            margin-left: 5px;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .cta-section {
+            padding: 120px 0;
+            text-align: center;
+            background: linear-gradient(to top, #000, var(--primary-bg));
+        }
+
+        .cta-btn-large {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--secondary-bg);
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 40px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(108, 168, 163, 0.3);
+        }
+
+        .cta-btn-large:hover {
+            transform: scale(1.05);
+            background: white;
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Professional Glass Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">
+            <a href="index.html"
+                style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-leaf" style="color: var(--accent);"></i> EcoSphere
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#solutions">Solutions</a>
+            <a href="index.html#technology">Technology</a>
+            <a href="about.html">About</a>
+            <a href="#" class="btn-connect">Request Quote</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero indoor-hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span
+                style="color: var(--accent); letter-spacing: 3px; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; display: block;">Hyper-Local
+                Supply</span>
+            <h1>Farming Anywhere</h1>
+            <p class="subtitle">FROM PARKING LOTS TO ROOFTOPS.</p>
+        </div>
+    </section>
+
+    <!-- The Problem & Solution -->
+    <section class="content-section">
+        <div class="split-layout">
+            <div class="split-text reveal">
+                <h2>The Supply Chain Break</h2>
+                <p>The average head of lettuce travels 1,500 miles to reach your plate. This results in massive carbon
+                    emissions, loss of nutrients, and 40% food waste during transit. We rely too much on distant
+                    "breadbaskets."</p>
+
+                <h2 style="margin-top: 50px;">The Container Revolution</h2>
+                <p> EcoSphere's <strong>Smart Containers</strong> serve as plug-and-play farm modules. We retrofit
+                    insulated shipping containers with state-of-the-art hydroponics, enabling you to grow 3 acres worth
+                    of food in a 320 sq ft box. Drop it anywhere, plug it in, and start harvesting.</p>
+
+                <ul style="list-style: none; margin-top: 20px; color: var(--text-gray);">
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Weatherproof Production</li>
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Stackable Design</li>
+                    <li style="margin-bottom: 15px;"><i class="fa-solid fa-check"
+                            style="color: var(--accent); margin-right: 10px;"></i> Harvest Within 4 Weeks</li>
+                </ul>
+            </div>
+            <div class="split-image reveal">
+                <img src="assets/indoor_process_diagram.png" alt="Container Diagram">
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section reveal">
+        <div class="section-head-center">
+            <h2>The Box That Feeds</h2>
+            <p>A tour of a high-density urban deployment in New York City.</p>
+        </div>
+        <div class="video-wrapper">
+            <div class="video-overlay">
+                <div class="play-btn">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+            </div>
+            <!-- Text on video -->
+            <div style="position: absolute; bottom: 30px; left: 40px; z-index: 2;">
+                <h3 style="margin-bottom: 5px;">Brooklyn Rooftop Cluster</h3>
+                <p style="opacity: 0.8; font-size: 0.9rem;">Duration: 2:30</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Detailed Process Flow -->
+    <section class="process-section" style="background: var(--dark-bg); padding-bottom: 50px;">
+        <div class="section-head-center reveal">
+            <h2>Inside the Module</h2>
+            <p>Every inch is engineered for maximum output.</p>
+        </div>
+
+        <div class="content-section" style="padding-top: 20px;">
+            <div class="process-flow">
+                <!-- Step 1 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image" style="background-image: url('assets/card_indoor.png');"></div>
+                    <div class="step-text">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h3>Climate Hermetics</h3>
+                            <p>The container acts as a sealed biosphere. We control CO2 levels (up to 1200ppm),
+                                humidity, and temperature independent of the blizzard or heatwave outside. This speeds
+                                up photosynthesis significantly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image"
+                        style="background-image: url('assets/indoor_process_diagram.png'); max-width: 90%; margin: 0 auto; background-size: contain; background-repeat: no-repeat;">
+                    </div>
+                    <div class="step-text">
+                        <div class="step-number">02</div>
+                        <div class="step-content">
+                            <h3>Vertical Arrays</h3>
+                            <p>Our proprietary rack system features vertical zip-towers. Nutrient water drips down the
+                                towers, bathing roots in oxygen and minerals, before being recaptured, filtered, and
+                                recirculated.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flow-step-container reveal">
+                    <div class="step-image" style="background-image: url('assets/indoor_detail_hero.png');"></div>
+                    <div class="step-text">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h3>Remote Management</h3>
+                            <p>You don't need a PhD to be a farmer. The entire farm is monitored by our cloud AI. You
+                                get alerts on your phone if pH drifts or a tank needs refilling. We handle the biology;
+                                you handle the harvest.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Dive -->
+                <div class="technical-deep-dive reveal"
+                    style="margin-top: 80px; background: rgba(255,255,255,0.03); padding: 40px; border-radius: 20px;">
+                    <h3 style="color: var(--accent); margin-bottom: 30px; font-size: 2rem;">Technical Deep Dive:
+                        Software-Defined Agriculture</h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <h4 style="color: white; margin-bottom: 15px;">CO<sub>2</sub> Enrichment</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 20px;">
+                                Outside air is only 415ppm CO<sub>2</sub>. In our sealed containers, we boost this to
+                                1,000-1,200ppm.
+                                This saturates the Rubisco enzyme in the leaves, supercharging photosynthesis by up to
+                                40%.
+                                It's like a turbocharger for plants.
+                            </p>
+
+                            <h4 style="color: white; margin-bottom: 15px;">Water Reclamation HVAC</h4>
+                            <p style="color: var(--text-gray);">
+                                Plants transpire 95% of the water they drink back into the air. Our heavy-duty
+                                dehumidifiers capture this water vapor,
+                                condense it, UV-sterilize it, and pump it right back to the roots.
+                                We don't just "save" water; we use the same water molecules over and over again.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 style="color: white; margin-bottom: 15px;">Recipe-Based Phenotyping</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 20px;">
+                                Want spicy arugula? We stress the plant with blue light and mild drought. Want sweet
+                                basil?
+                                We adjust the Potassium/Nitrate ratio. We don't use GMOs; we use epigenetics—triggering
+                                the plant's natural genetic expression through precise climate recipes.
+                            </p>
+                            <h4 style="color: white; margin-bottom: 15px;">Total Traceability (Blockchain)</h4>
+                            <p style="color: var(--text-gray);">
+                                Every seed is tracked. We log every variable (temperature, pH, human interaction) to an
+                                immutable ledger.
+                                Retailers can scan a QR code on the package and see the exact minute the seed was
+                                planted and who harvested it.
+                                Unprecedented food safety transparency.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="comparison-section">
+        <div class="section-head-center reveal">
+            <h2>System Comparison</h2>
+            <p>Traditional Greenhouse vs. EcoSphere Container.</p>
+        </div>
+
+        <table class="comp-table reveal">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Greenhouse</th>
+                    <th class="high-light">EcoSphere Container</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Footprint</td>
+                    <td>Large Land Required</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> 1 Parking Spot</td>
+                </tr>
+                <tr>
+                    <td>Seasonality</td>
+                    <td>Weather Dependent</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> 365 Days/Year</td>
+                </tr>
+                <tr>
+                    <td>Water Use</td>
+                    <td>Moderate</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Ultra-Low (Recycled)</td>
+                </tr>
+                <tr>
+                    <td>Transport</td>
+                    <td>Regional</td>
+                    <td><i class="check-icon fa-solid fa-check"></i> Zero Mile (On-site)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ROI / Sales Pitch -->
+    <section class="roi-section">
+        <div class="section-head-center reveal">
+            <h2>A Farm in a Box</h2>
+            <p>Highly scalable business model. Start with one, expand to fifty.</p>
+        </div>
+
+        <div class="roi-grid reveal">
+            <div class="roi-card">
+                <span class="roi-value">13k</span>
+                <p>Heads of Lettuce / Year</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">&lt;5 Gal</span>
+                <p>Water Daily Usage</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">18 Mo</span>
+                <p>ROI Payback Period</p>
+            </div>
+            <div class="roi-card">
+                <span class="roi-value">100%</span>
+                <p>Traceable Food Safety</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI Calculator -->
+    <section class="calculator-section reveal">
+        <div class="section-head-center">
+            <h2>Calculate Your Impact</h2>
+            <p>Estimate the potential yield and revenue for your facility.</p>
+        </div>
+        <div class="calculator-box">
+            <div class="calc-inputs">
+                <div class="form-group">
+                    <label>Facility Size (Sq Ft)</label>
+                    <input type="number" id="calc-space" placeholder="e.g. 5000">
+                </div>
+                <div class="form-group">
+                    <label>Primary Crop</label>
+                    <select id="calc-crop">
+                        <option value="lettuce">Leafy Greens</option>
+                        <option value="basil">Herbs</option>
+                        <option value="tomatoes">Vining Crops</option>
+                        <option value="tilapia">Fish Stock</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="calculateROI()">Calculate Potential</button>
+            </div>
+            <div class="calc-results" id="calculator-results">
+                <div class="result-item">
+                    <span>Est. Annual Yield</span>
+                    <div class="result-val" id="result-yield">0</div>
+                    <span style="display:inline; font-size: 1rem;">lbs</span>
+                </div>
+                <div class="result-item">
+                    <span>Est. Gross Revenue</span>
+                    <div class="result-val" id="result-revenue">$0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section reveal">
+        <h2 style="font-size: 3.5rem; margin-bottom: 20px;">Deploy Your Farm</h2>
+        <p style="font-size: 1.2rem; color: var(--text-gray); max-width: 600px; margin: 0 auto;">Join the distributed
+            network of urban farmers today.</p>
+        <a href="#" class="cta-btn-large">Configure Your Unit</a>
+        <br>
+        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.6;">Or call our sales team: +1 (800) 555-0199</p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2><i class="fa-solid fa-leaf"></i> EcoSphere</h2>
+                <p>Pioneering the future of food through technology, sustainability, and innovation.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Solutions</h4>
+                <ul>
+                    <li><a href="aquafarming.html">Aquaculture</a></li>
+                    <li><a href="hydrofarming.html">Hydroponics</a></li>
+                    <li><a href="integrated_farming.html">Integrated Farming</a></li>
+                    <li><a href="agrivoltaics.html">Agrivoltaics</a></li>
+                    <li><a href="indoor_farming.html">Indoor Farming</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 EcoSphere AgTech. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="calculator.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
